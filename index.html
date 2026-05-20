@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Colorado 14ers — Summit Tracker</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23060d12'/%3E%3Cpolygon points='16,3 30,27 2,27' fill='%2326c6da'/%3E%3Cpolygon points='16,3 20,11 12,11' fill='%23e0f2f1' opacity='0.85'/%3E%3C/svg%3E">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -242,11 +243,10 @@
     transition: left 0.2s, background 0.15s, color 0.15s, border-color 0.15s;
   }
   
-  .sidebar.collapsed + * .collapse-btn-left,
-  .sidebar.collapsed ~ .collapse-btn-left {
+  body.sidebar-collapsed .collapse-btn-left {
     left: 0px;
   }
-  
+
   .collapse-btn-right {
     right: 300px;
     border-right: none;
@@ -254,8 +254,8 @@
     transition: right 0.2s, opacity 0.2s, background 0.15s, color 0.15s, border-color 0.15s;
   }
 
-  .detail-panel.collapsed ~ .collapse-btn-right {
-    display: none;
+  body.detail-collapsed .collapse-btn-right {
+    right: 0px;
   }
   
   .collapse-btn:hover {
@@ -1544,7 +1544,7 @@
           <ellipse cx="320" cy="264" rx="4"  ry="14"  stroke="rgba(200,235,255,0.38)" stroke-width="1" stroke-dasharray="2,3"/>
         </g>
 
-        <!-- FRONT RANGE NORTH (Longs → Evans → Bierstadt cluster) -->
+        <!-- FRONT RANGE NORTH (Longs → Blue Sky → Bierstadt cluster) -->
         <g fill="none">
           <ellipse cx="393" cy="185" rx="80" ry="105" stroke="rgba(110,155,200,0.07)" stroke-width="0.8"/>
           <ellipse cx="393" cy="185" rx="66" ry="88"  stroke="rgba(115,162,208,0.09)" stroke-width="0.8"/>
@@ -1690,14 +1690,15 @@
     <div class="detail-content" id="detailContent" style="display:none"></div>
   </div>
   
-  <!-- COLLAPSE BUTTONS (fixed position) -->
-  <button class="collapse-btn collapse-btn-left" id="btnCollapseSidebar" title="Collapse sidebar">
-    ‹
-  </button>
-  <button class="collapse-btn collapse-btn-right" id="btnCollapseDetail" title="Collapse detail panel">
-    ›
-  </button>
 </main>
+
+<!-- COLLAPSE BUTTONS (fixed position, outside main to avoid overflow:hidden clipping) -->
+<button class="collapse-btn collapse-btn-left" id="btnCollapseSidebar" title="Collapse sidebar">
+  ‹
+</button>
+<button class="collapse-btn collapse-btn-right" id="btnCollapseDetail" title="Collapse detail panel">
+  ›
+</button>
 
 <div id="tooltip"></div>
 
@@ -1735,7 +1736,7 @@ const PEAKS = [
   // ── FRONT RANGE (6) ─────────────────────────────────────
   { id:16, name:"Grays Peak",              elev:14278, cls:1, range:"Front Range",     lat:39.6341, lng:-105.7758, season:"Jun–Oct", slug:"grays-and-torreys-peak",                           rating:4.8, miles:8.0,  gain:3000, sub:false },
   { id:17, name:"Torreys Peak",            elev:14267, cls:1, range:"Front Range",     lat:39.6428, lng:-105.8211, season:"Jun–Oct", slug:"grays-and-torreys-peak",                           rating:4.8, miles:8.0,  gain:3000, sub:false },
-  { id:18, name:"Mount Evans",             elev:14264, cls:1, range:"Front Range",     lat:39.5883, lng:-105.6433, season:"Jun–Oct", slug:"mount-blue-sky-summit-trail",                      rating:4.7, miles:13.5, gain:2850, sub:false, note:"Also known as Mt. Blue Sky. Highest paved road in the US nearby." },
+  { id:18, name:"Mount Blue Sky",          elev:14264, cls:1, range:"Front Range",     lat:39.5883, lng:-105.6433, season:"Jun–Oct", slug:"mount-blue-sky-summit-trail",                      rating:4.7, miles:13.5, gain:2850, sub:false, note:"Also known as Mt. Evans. Highest paved road in the US nearby." },
   { id:19, name:"Longs Peak",              elev:14259, cls:3, range:"Front Range",     lat:40.2550, lng:-105.6150, season:"Jul–Sep", slug:"the-keyhole-and-longs-peak-trail",                 rating:4.8, miles:13.6, gain:4934, sub:false, note:"Most technical Front Range 14er. The Keyhole Route is Class 3. Early start (2–3am) required." },
   { id:20, name:"Mount Bierstadt",         elev:14060, cls:1, range:"Front Range",     lat:39.5836, lng:-105.7086, season:"Jun–Oct", slug:"mount-bierstadt-trail",                            rating:4.7, miles:7.0,  gain:2850, sub:false, note:"One of the most popular beginner-friendly 14ers near Denver." },
   { id:21, name:"Pikes Peak",              elev:14115, cls:1, range:"Front Range",     lat:38.8409, lng:-105.0423, season:"Jun–Oct", slug:"pikes-peak-via-barr-trail--2",                     rating:4.8, miles:24.2, gain:7444, sub:false, note:"Iconic summit. Accessible by cog railway or car road. Barr Trail is the classic hike route." },
@@ -2783,60 +2784,114 @@ function renderPanorama() {
   ctx.fillText('14,000 - 14,440 ft', 1560, 760);
   
   const canvasWrapper = document.createElement('div');
-  canvasWrapper.style.padding = '20px 0';
-  canvasWrapper.style.position = 'relative';
-  
-  // Add zoom controls
+  canvasWrapper.style.cssText = 'padding: 20px 0; position: relative;';
+
+  // Zoom state — pixel-based so the panWrapper can actually scroll
+  let panoScale = 1;
+
+  function applyPanoScale(s) {
+    panoScale = s;
+    if (s <= 1) {
+      canvas.style.width = '100%';
+      canvas.style.height = 'auto';
+      panWrapper.scrollLeft = 0;
+      panWrapper.scrollTop = 0;
+    } else {
+      canvas.style.width = (panWrapper.clientWidth * s) + 'px';
+      canvas.style.height = 'auto';
+    }
+    zoomResetBtn.textContent = Math.round(s * 100) + '%';
+  }
+
+  // Zoom controls
   const zoomControls = document.createElement('div');
   zoomControls.style.cssText = 'position:absolute;top:30px;right:20px;display:flex;gap:8px;z-index:10;';
-  
+
   const zoomInBtn = document.createElement('button');
   zoomInBtn.textContent = '+';
   zoomInBtn.style.cssText = 'width:32px;height:32px;border-radius:4px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer;font-size:18px;font-weight:bold;';
-  zoomInBtn.onclick = () => {
-    const scale = parseFloat(canvas.style.transform.replace(/[^0-9.]/g, '') || '1');
-    const newScale = Math.min(scale + 0.25, 3);
-    canvas.style.transform = `scale(${newScale})`;
-    canvas.style.transformOrigin = 'center top';
-    canvas.parentElement.style.overflowX = 'auto';
-  };
-  
+  zoomInBtn.onclick = () => applyPanoScale(Math.min(panoScale + 0.25, 3));
+
   const zoomOutBtn = document.createElement('button');
   zoomOutBtn.textContent = '−';
   zoomOutBtn.style.cssText = 'width:32px;height:32px;border-radius:4px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer;font-size:18px;font-weight:bold;';
-  zoomOutBtn.onclick = () => {
-    const scale = parseFloat(canvas.style.transform.replace(/[^0-9.]/g, '') || '1');
-    const newScale = Math.max(scale - 0.25, 1);
-    canvas.style.transform = `scale(${newScale})`;
-    if (newScale === 1) {
-      canvas.style.transform = '';
-      canvas.parentElement.style.overflowX = 'hidden';
-    }
-  };
-  
+  zoomOutBtn.onclick = () => applyPanoScale(Math.max(panoScale - 0.25, 1));
+
   const zoomResetBtn = document.createElement('button');
   zoomResetBtn.textContent = '100%';
   zoomResetBtn.style.cssText = 'padding:0 10px;height:32px;border-radius:4px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer;font-size:11px;';
-  zoomResetBtn.onclick = () => {
-    canvas.style.transform = '';
-    canvas.parentElement.style.overflowX = 'hidden';
-  };
-  
+  zoomResetBtn.onclick = () => applyPanoScale(1);
+
   zoomControls.appendChild(zoomInBtn);
   zoomControls.appendChild(zoomOutBtn);
   zoomControls.appendChild(zoomResetBtn);
   canvasWrapper.appendChild(zoomControls);
-  
-  canvasWrapper.appendChild(canvas);
-  
-  // Make canvas clickable to select peaks
-  canvas.style.cursor = 'pointer';
+
+  // Pan wrapper — overflow:hidden lets us scroll programmatically without showing scrollbars
+  const panWrapper = document.createElement('div');
+  panWrapper.style.cssText = 'overflow:hidden;cursor:grab;border-radius:8px;user-select:none;';
+
+  // Drag-to-pan
+  let isDragging = false, dragStartX, dragStartY, dragScrollLeft, dragScrollTop, didDrag = false;
+
+  panWrapper.addEventListener('mousedown', (e) => {
+    if (e.target.tagName === 'BUTTON') return;
+    isDragging = true;
+    didDrag = false;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    dragScrollLeft = panWrapper.scrollLeft;
+    dragScrollTop = panWrapper.scrollTop;
+    panWrapper.style.cursor = 'grabbing';
+    e.preventDefault();
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    panWrapper.style.cursor = 'grab';
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const dx = e.clientX - dragStartX;
+    const dy = e.clientY - dragStartY;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) didDrag = true;
+    panWrapper.scrollLeft = dragScrollLeft - dx;
+    panWrapper.scrollTop = dragScrollTop - dy;
+  });
+
+  // Touch support
+  panWrapper.addEventListener('touchstart', (e) => {
+    const t = e.touches[0];
+    isDragging = true; didDrag = false;
+    dragStartX = t.clientX; dragStartY = t.clientY;
+    dragScrollLeft = panWrapper.scrollLeft; dragScrollTop = panWrapper.scrollTop;
+  }, { passive: true });
+
+  panWrapper.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    const t = e.touches[0];
+    const dx = t.clientX - dragStartX;
+    const dy = t.clientY - dragStartY;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) didDrag = true;
+    panWrapper.scrollLeft = dragScrollLeft - dx;
+    panWrapper.scrollTop = dragScrollTop - dy;
+  }, { passive: true });
+
+  panWrapper.addEventListener('touchend', () => { isDragging = false; });
+
+  panWrapper.appendChild(canvas);
+  canvasWrapper.appendChild(panWrapper);
+
+  // Click to select peaks — suppressed if the user was dragging
+  canvas.style.cursor = 'inherit';
   canvas.addEventListener('click', (e) => {
+    if (didDrag) { didDrag = false; return; }
     const rect = canvas.getBoundingClientRect();
     const x = (e.clientX - rect.left) * (1600 / rect.width);
     const y = (e.clientY - rect.top) * (800 / rect.height);
-    
-    // Find nearest peak across all layers
+
     let nearest = null;
     let minDist = Infinity;
 
@@ -2854,10 +2909,10 @@ function renderPanorama() {
         if (dist < minDist && dist < 40) { minDist = dist; nearest = p; }
       });
     }
-    
+
     if (nearest) selectPeak(nearest.id);
   });
-  
+
   terrainSection.appendChild(canvasWrapper);
   container.appendChild(terrainSection);
 }
@@ -2868,13 +2923,17 @@ function renderPanorama() {
 document.getElementById('btnCollapseSidebar').addEventListener('click', function() {
   const sidebar = document.querySelector('.sidebar');
   sidebar.classList.toggle('collapsed');
-  this.textContent = sidebar.classList.contains('collapsed') ? '›' : '‹';
+  const isCollapsed = sidebar.classList.contains('collapsed');
+  document.body.classList.toggle('sidebar-collapsed', isCollapsed);
+  this.textContent = isCollapsed ? '›' : '‹';
 });
 
 document.getElementById('btnCollapseDetail').addEventListener('click', function() {
   const panel = document.querySelector('.detail-panel');
   panel.classList.toggle('collapsed');
-  this.textContent = panel.classList.contains('collapsed') ? '‹' : '›';
+  const isCollapsed = panel.classList.contains('collapsed');
+  document.body.classList.toggle('detail-collapsed', isCollapsed);
+  this.textContent = isCollapsed ? '‹' : '›';
 });
 
 // ============================================================
