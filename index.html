@@ -1,0 +1,3036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Colorado 14ers — Summit Tracker</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #060d12;
+    --panel: rgba(10,20,28,0.85);
+    --panel2: rgba(15,28,38,0.9);
+    --border: rgba(38,198,218,0.15);
+    --text: #e0f2f1;
+    --muted: rgba(139,195,199,0.7);
+    --accent: #26c6da;
+    --accent-bright: #00e5ff;
+    --c1: #26c6da;
+    --c2: #26c6da;
+    --c3: #00bcd4;
+    --c4: #0097a7;
+    --summited: #ab47bc;
+    --range-sawatch: #164e63;
+    --range-front: #1e3a5f;
+    --range-mosquito: #1a3a1a;
+    --range-elk: #2d1b00;
+    --range-sangre: #3b1a1a;
+    --range-sanjuan: #1a1a3b;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 13px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  /* HERO HEADER */
+  header {
+    background: var(--panel);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 0 20px rgba(38,198,218,0.1);
+    padding: 18px 24px 16px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: flex-start;
+    gap: 2px;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .logo-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .logo-tagline {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.8px;
+    color: rgba(74,222,128,0.7);
+    padding-left: 38px;
+  }
+
+  .logo svg {
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 8px rgba(38,198,218,0.6));
+  }
+
+  .hero-title {
+    flex: 1;
+    text-align: center;
+  }
+
+  .hero-title h1 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    background: linear-gradient(135deg, #e6edf3 55%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 5px 0;
+    line-height: 1.2;
+  }
+
+  .hero-title p {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin: 0 auto;
+    line-height: 1.55;
+    max-width: 460px;
+  }
+
+  /* UTILITY BAR */
+  .tabs {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding: 0 16px;
+    background: var(--panel2);
+    height: 40px;
+    flex-shrink: 0;
+    gap: 2px;
+  }
+
+  .progress-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+    padding-left: 14px;
+    border-left: 1px solid var(--border);
+  }
+
+  .progress-label {
+    white-space: nowrap;
+    font-weight: 600;
+    color: var(--accent);
+    font-size: 12px;
+    letter-spacing: 0.3px;
+    text-shadow: 0 0 8px rgba(38,198,218,0.3);
+  }
+
+  .progress-bar-wrap {
+    width: 80px;
+    background: var(--border);
+    border-radius: 999px;
+    height: 6px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--summited), #7c3aed);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
+
+  .progress-pct {
+    color: var(--muted);
+    font-size: 11px;
+    min-width: 26px;
+  }
+
+  .legend {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-left: 12px;
+    border-left: 1px solid var(--border);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .tab {
+    padding: 0 14px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    transition: color .15s, border-color .15s;
+    user-select: none;
+  }
+
+  .tab.active {
+    color: #4ade80;
+    border-bottom-color: #4ade80;
+    text-shadow: 0 0 8px rgba(74,222,128,0.4);
+  }
+
+  .tab.active svg {
+    filter: drop-shadow(0 0 3px rgba(74,222,128,0.7));
+  }
+
+  .tab:hover:not(.active) { color: #4ade80; }
+
+  /* COLLAPSE BUTTONS */
+  .collapse-btn {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 60px;
+    border-radius: 0;
+    border: 1px solid var(--border);
+    background: var(--panel2);
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s;
+    font-size: 14px;
+    z-index: 100;
+  }
+  
+  .collapse-btn-left {
+    left: 240px;
+    border-left: none;
+    border-radius: 0 4px 4px 0;
+    transition: left 0.2s, background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  
+  .sidebar.collapsed + * .collapse-btn-left,
+  .sidebar.collapsed ~ .collapse-btn-left {
+    left: 0px;
+  }
+  
+  .collapse-btn-right {
+    right: 300px;
+    border-right: none;
+    border-radius: 4px 0 0 4px;
+    transition: right 0.2s, opacity 0.2s, background 0.15s, color 0.15s, border-color 0.15s;
+  }
+
+  .detail-panel.collapsed ~ .collapse-btn-right {
+    display: none;
+  }
+  
+  .collapse-btn:hover {
+    background: var(--panel);
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  /* MAIN */
+  main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: width 0.2s, margin-left 0.2s;
+    position: relative;
+  }
+
+  /* TABS */
+  
+  .sidebar.collapsed {
+    width: 0;
+    margin-left: -1px;
+    border-right: none;
+  }
+
+  .sidebar-section {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-section-header {
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .sidebar-section-header:hover h3 {
+    color: var(--text);
+  }
+
+  .sidebar-section h3 {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #4ade80;
+    margin: 0;
+    transition: color .15s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .info-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    border: 1px solid rgba(74,222,128,0.4);
+    color: rgba(74,222,128,0.6);
+    font-size: 8px;
+    font-style: normal;
+    font-weight: 700;
+    cursor: default;
+    position: relative;
+    flex-shrink: 0;
+    transition: all .15s;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .info-icon:hover {
+    border-color: #4ade80;
+    color: #4ade80;
+    background: rgba(74,222,128,0.08);
+  }
+
+  .info-icon .tooltip {
+    display: none;
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--muted);
+    white-space: normal;
+    width: 180px;
+    z-index: 200;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .info-icon:hover .tooltip {
+    display: block;
+  }
+
+  .sidebar-section-toggle {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    transition: transform .2s, color .15s;
+  }
+
+  .sidebar-section.collapsed .sidebar-section-toggle {
+    transform: rotate(-90deg);
+  }
+
+  .sidebar-section-content {
+    padding: 0 12px 12px 12px;
+    overflow: hidden;
+    transition: max-height .2s ease-out, opacity .2s;
+  }
+
+  .sidebar-section.collapsed .sidebar-section-content {
+    max-height: 0 !important;
+    padding-top: 0;
+    padding-bottom: 0;
+    opacity: 0;
+  }
+
+  .filter-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+  }
+
+  .filter-chip {
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all .15s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: inherit;
+  }
+
+  .filter-chip .chip-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+  }
+
+  .filter-chip.active {
+    border-color: currentColor;
+    color: var(--text);
+    background: var(--panel2);
+  }
+
+  .filter-chip:hover { background: var(--panel2); }
+
+  .range-filter {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+  }
+
+  .range-chip.range-all {
+    grid-column: 1 / -1;
+  }
+
+  .range-chip {
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all .15s;
+    text-align: left;
+    font-family: inherit;
+  }
+
+  .range-chip.active {
+    border-color: var(--border);
+    color: var(--text);
+    background: var(--panel2);
+  }
+
+  .range-chip:hover { background: var(--panel2); color: var(--text); }
+
+  .filter-row {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+
+  .filter-toggle {
+    padding: 3px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all .15s;
+    font-family: inherit;
+  }
+
+  .filter-toggle.active {
+    background: var(--panel2);
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  /* PEAK LIST */
+  .peak-list-wrap {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .peak-list-wrap::-webkit-scrollbar { width: 4px; }
+  .peak-list-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .peak-list-item {
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background .1s;
+    border-left: 2px solid transparent;
+  }
+
+  .peak-list-item:hover { background: var(--panel2); }
+
+  .peak-list-item.selected {
+    background: var(--panel2);
+    border-left-color: var(--accent);
+  }
+
+  .peak-list-item.hidden { display: none; }
+
+  .peak-cb {
+    appearance: none;
+    width: 14px; height: 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    transition: all .15s;
+  }
+
+  .peak-cb:checked {
+    background: var(--summited);
+    border-color: var(--summited);
+  }
+
+  .peak-cb:checked::after {
+    content: '';
+    position: absolute;
+    top: 1px; left: 3px;
+    width: 5px; height: 8px;
+    border: 1.5px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg);
+  }
+
+  .peak-list-name {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 12px;
+  }
+
+  .peak-list-item.summited .peak-list-name {
+    color: var(--summited);
+    text-decoration: line-through;
+    text-decoration-color: var(--summited);
+  }
+
+  .peak-list-elev {
+    font-size: 10px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .class-badge {
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* MAP AREA */
+  .map-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .map-container {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: radial-gradient(ellipse at center, #0d1b2a 0%, #060d14 100%);
+  }
+
+  #mapSvg {
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  /* TOOLTIP */
+  #tooltip {
+    position: fixed;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    pointer-events: none;
+    font-size: 12px;
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(0,0,0,.6);
+    opacity: 0;
+    transition: opacity .1s;
+    min-width: 150px;
+  }
+
+  #tooltip.visible { opacity: 1; }
+
+  #tooltip .tt-name { font-weight: 600; margin-bottom: 3px; }
+  #tooltip .tt-info { color: var(--muted); font-size: 11px; }
+
+  /* DETAIL PANEL */
+  .detail-panel {
+    width: 300px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: width 0.2s, margin-right 0.2s;
+    position: relative;
+  }
+  
+  /* DETAIL PANEL */
+  .detail-panel {
+    width: 300px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: visible;
+    transition: width 0.2s, margin-right 0.2s;
+    position: relative;
+  }
+  
+  .detail-panel.collapsed {
+    width: 0;
+    margin-right: -1px;
+    border-left: none;
+  }
+
+  .detail-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    text-align: center;
+    padding: 24px;
+    gap: 10px;
+  }
+
+  .detail-empty svg { 
+    opacity: .5;
+    filter: drop-shadow(0 0 6px rgba(38,198,218,0.3));
+  }
+
+  .detail-content {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .detail-content::-webkit-scrollbar { width: 4px; }
+  .detail-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .detail-hero {
+    padding: 20px 16px 16px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    background: linear-gradient(180deg, rgba(38,198,218,0.05) 0%, transparent 100%);
+  }
+
+  .detail-class-badge {
+    position: absolute;
+    top: 16px; right: 16px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .detail-range {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: rgba(38,198,218,0.7);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .detail-name {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 4px;
+    background: linear-gradient(135deg, #00e5ff, #26c6da);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .detail-elev {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .detail-elev span { color: var(--text); font-weight: 600; }
+
+  .summit-btn {
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .summit-btn.unsummited {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .summit-btn.unsummited:hover {
+    border-color: var(--summited);
+    color: var(--summited);
+  }
+
+  .summit-btn.summited {
+    background: rgba(167, 139, 250, 0.15);
+    border: 1px solid var(--summited);
+    color: var(--summited);
+  }
+
+  .detail-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat-cell {
+    background: var(--panel);
+    padding: 10px 14px;
+    position: relative;
+  }
+  
+  .stat-cell::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--accent), transparent);
+    opacity: 0.4;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(38,198,218,0.6);
+    margin-bottom: 3px;
+    font-weight: 600;
+  }
+
+  .stat-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-bright);
+    text-shadow: 0 0 8px rgba(38,198,218,0.3);
+  }
+
+  .stat-sub {
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .detail-section {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .detail-section h4 {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: rgba(38,198,218,0.7);
+    margin-bottom: 8px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .detail-section h4::before {
+    content: '▸';
+    color: var(--accent);
+    font-size: 12px;
+  }
+
+  .detail-section p {
+    color: var(--muted);
+    line-height: 1.6;
+    font-size: 12px;
+  }
+
+  .season-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: rgba(56, 139, 253, .1);
+    border: 1px solid rgba(56, 139, 253, .3);
+    border-radius: 999px;
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .alltrails-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: rgba(38,198,218,0.08);
+    border: 1px solid rgba(38,198,218,0.3);
+    border-radius: 8px;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all .25s;
+    margin: 12px 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .alltrails-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(38,198,218,0.15), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+  }
+
+  .alltrails-btn:hover {
+    background: rgba(38,198,218,0.15);
+    border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(38,198,218,0.3);
+    transform: translateY(-1px);
+  }
+  
+  .alltrails-btn:hover::before {
+    transform: translateX(100%);
+  }
+
+  .alltrails-btn svg { flex-shrink: 0; }
+
+  .sub-peak-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: rgba(139, 148, 158, .1);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* SOURCE ATTRIBUTION BADGES */
+  .src-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    vertical-align: middle;
+    margin-left: 4px;
+    white-space: nowrap;
+    line-height: 1.5;
+  }
+  .src-at   { background: rgba(34,197,94,0.12);  color: #4ade80; border: 1px solid rgba(34,197,94,0.25); }
+  .src-usgs { background: rgba(56,139,253,0.12); color: #79b8ff; border: 1px solid rgba(56,139,253,0.25); }
+  .src-14ers{ background: rgba(251,191,36,0.10); color: #fbbf24; border: 1px solid rgba(251,191,36,0.22); }
+
+  .sources-footer {
+    padding: 14px 16px 16px;
+    background: linear-gradient(180deg, rgba(38,198,218,0.03), rgba(38,198,218,0.08));
+    border-top: 1px solid var(--border);
+  }
+  
+  .sources-footer-title {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(38,198,218,0.7);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  
+  .sources-footer-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+  
+  .sources-footer-row .src-badge { flex-shrink: 0; margin-left: 0; }
+  
+  .alltrails-cta {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: rgba(74,222,128,0.08);
+    border: 1px solid rgba(74,222,128,0.2);
+    border-radius: 6px;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  
+  .alltrails-cta a {
+    color: #4ade80;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(74,222,128,0.3);
+    transition: all 0.2s;
+  }
+  
+  .alltrails-cta a:hover {
+    border-bottom-color: #4ade80;
+    text-shadow: 0 0 8px rgba(74,222,128,0.3);
+  }
+
+  /* PANORAMA VIEW */
+  .panorama-container {
+    flex: 1;
+    overflow: auto;
+    padding: 40px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .pano-range {
+    margin-bottom: 32px;
+  }
+
+  .pano-range-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: rgba(38,198,218,0.7);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(38,198,218,0.15);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .pano-range-title::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--accent);
+  }
+
+  .pano-peaks {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .pano-peak {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    width: 80px;
+    transition: all .25s;
+    position: relative;
+  }
+
+  .pano-peak:hover { 
+    transform: translateY(-4px);
+  }
+
+  .pano-mountain {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    width: 100%;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: linear-gradient(180deg, transparent 0%, rgba(38,198,218,0.05) 100%);
+    border: 1px solid rgba(38,198,218,0.15);
+    padding: 8px;
+  }
+  
+  .pano-mountain::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, 
+      rgba(38,198,218,0.0) 0%,
+      rgba(38,198,218,0.05) 40%,
+      rgba(38,198,218,0.15) 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .pano-peak:hover .pano-mountain::before {
+    opacity: 1;
+  }
+
+  .pano-peak-name {
+    font-size: 10px;
+    text-align: center;
+    line-height: 1.4;
+    color: rgba(224,242,241,0.9);
+    max-width: 80px;
+    font-weight: 600;
+  }
+
+  .pano-peak.summited .pano-peak-name { 
+    color: var(--summited);
+    text-shadow: 0 0 8px rgba(171,71,188,0.5);
+  }
+
+  .pano-elev-label {
+    font-size: 8px;
+    color: rgba(38,198,218,0.6);
+    opacity: .8;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+
+  /* List view */
+  .list-view-container {
+    flex: 1;
+    overflow: auto;
+    padding: 16px;
+  }
+
+  .list-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .list-table th {
+    text-align: left;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .list-table th:hover { color: var(--text); }
+
+  .list-table td {
+    padding: 7px 12px;
+    border-bottom: 1px solid rgba(48,54,61,.5);
+    font-size: 12px;
+  }
+
+  .list-table tr { cursor: pointer; transition: background .1s; }
+  .list-table tr:hover { background: var(--panel2); }
+  .list-table tr.selected { background: rgba(56,139,253,.08); }
+  .list-table tr.summited td:nth-child(2) { color: var(--summited); text-decoration: line-through; text-decoration-color: var(--summited); }
+  .list-table tr.hidden { display: none; }
+
+  /* RANGE BADGES */
+  .range-tag {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    background: var(--panel2);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* Stars */
+  .stars { color: #eab308; font-size: 11px; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 900px) {
+    .sidebar { width: 180px; }
+    .detail-panel { width: 280px; }
+  }
+  
+  @media (max-width: 768px) {
+    header {
+      flex-wrap: wrap;
+      height: auto;
+      padding: 12px 16px;
+    }
+    
+    .logo {
+      font-size: 14px;
+    }
+    
+    .progress-section {
+      order: 3;
+      flex-basis: 100%;
+      margin-top: 8px;
+    }
+    
+    .legend {
+      display: none;
+    }
+    
+    .tabs {
+      padding: 0 8px;
+    }
+    
+    .tab {
+      padding: 0 10px;
+      font-size: 11px;
+    }
+    
+    main {
+      flex-direction: column;
+    }
+    
+    .sidebar {
+      width: 100%;
+      max-height: 200px;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .peak-list-wrap {
+      max-height: 140px;
+    }
+    
+    .detail-panel {
+      width: 100%;
+      border-left: none;
+      border-top: 1px solid var(--border);
+      max-height: 300px;
+    }
+    
+    .map-area {
+      flex: 1;
+      min-height: 0;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .sidebar-section {
+      padding: 8px;
+    }
+    
+    .filter-grid {
+      gap: 3px;
+    }
+    
+    .filter-chip {
+      font-size: 10px;
+      padding: 3px 6px;
+    }
+    
+    .progress-label {
+      font-size: 12px;
+    }
+  }
+  /* DISCLAIMER BAR */
+  .disclaimer-bar {
+    background: rgba(74,222,128,0.04);
+    border-bottom: 1px solid rgba(74,222,128,0.12);
+    padding: 7px 20px;
+    font-size: 10.5px;
+    color: var(--muted);
+    line-height: 1.5;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .disclaimer-bar a {
+    color: rgba(74,222,128,0.7);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(74,222,128,0.25);
+  }
+
+  .disclaimer-bar a:hover {
+    color: #4ade80;
+    border-bottom-color: #4ade80;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-main">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <path d="M4 22 L10 10 L14 16 L18 8 L24 22 Z" fill="#30363d" stroke="#4ade80" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="14" cy="5" r="2" fill="#eab308" opacity="0.8"/>
+      </svg>
+      Colorado 14ers
+    </div>
+    <div class="logo-tagline">Trail data powered by AllTrails</div>
+  </div>
+  <div class="hero-title">
+    <h1>Track Your Colorado 14ers Journey</h1>
+    <p>58 peaks. One tracker. Browse the Map for satellite detail, Panorama for terrain view, or List to sort and filter. Click any peak to see trail info and log your summits.</p>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-tab="map" onclick="switchTab('map')">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="margin-right: 4px">
+      <path d="M1 11L5 3L7 8L9 2L13 11Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" fill="none"/>
+      <circle cx="7" cy="1.5" r="1" fill="currentColor"/>
+    </svg>
+    Map
+  </div>
+  <div class="tab" data-tab="panorama" onclick="switchTab('panorama')">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="margin-right: 4px">
+      <path d="M1 10L3 6L5 9L6.5 5L8 8L9.5 4L11 7L13 10" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" fill="none"/>
+    </svg>
+    Panorama
+  </div>
+  <div class="tab" data-tab="list" onclick="switchTab('list')">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="margin-right: 4px">
+      <line x1="3" y1="3" x2="11" y2="3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="3" y1="7" x2="11" y2="7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="3" y1="11" x2="11" y2="11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+    List
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-label" id="progressLabel">0 / 58 Summited</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+    </div>
+    <div class="progress-pct" id="progressPct">0%</div>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c1)"></div>Class 1</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c2)"></div>Class 2</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c3)"></div>Class 3</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c4)"></div>Class 4</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--summited)"></div>Summited</div>
+  </div>
+</div>
+
+<div class="disclaimer-bar">
+  This tool uses the official AllTrails MCP connector, published by AllTrails for integration with AI assistants like Claude. Trail data is sourced directly through AllTrails' supported integration — no scraping or unofficial APIs are involved. AllTrails' terms of service and privacy policy govern data use and are subject to change; anyone using or building on this tool should review the latest policies at <a href="https://www.alltrails.com" target="_blank" rel="noopener">alltrails.com</a>.
+</div>
+
+<main>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section" data-section="class">
+      <div class="sidebar-section-header">
+        <h3>Difficulty Class <span class="info-icon">i<span class="tooltip">Filter peaks by climbing class. Class 1 is a trail hike; Class 4 requires rope work. Toggle multiple classes on or off — only checked classes appear in the list and map.</span></span></h3>
+        <div class="sidebar-section-toggle">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M3 4.5L6 7.5L9 4.5"/>
+          </svg>
+        </div>
+      </div>
+      <div class="sidebar-section-content">
+        <div class="filter-grid">
+        <button class="filter-chip active" data-class="1" onclick="toggleClassFilter(1,this)" style="--cc:var(--c1)">
+          <div class="chip-dot" style="background:var(--c1)"></div>Class 1
+        </button>
+        <button class="filter-chip active" data-class="2" onclick="toggleClassFilter(2,this)" style="--cc:var(--c2)">
+          <div class="chip-dot" style="background:var(--c2)"></div>Class 2
+        </button>
+        <button class="filter-chip active" data-class="3" onclick="toggleClassFilter(3,this)" style="--cc:var(--c3)">
+          <div class="chip-dot" style="background:var(--c3)"></div>Class 3
+        </button>
+        <button class="filter-chip active" data-class="4" onclick="toggleClassFilter(4,this)" style="--cc:var(--c4)">
+          <div class="chip-dot" style="background:var(--c4)"></div>Class 4
+        </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section" data-section="range">
+      <div class="sidebar-section-header">
+        <h3>Mountain Range <span class="info-icon">i<span class="tooltip">Colorado's 14ers span 6 mountain ranges. Select one to highlight just that range on the Map and Panorama, and filter the peak list below.</span></span></h3>
+        <div class="sidebar-section-toggle">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M3 4.5L6 7.5L9 4.5"/>
+          </svg>
+        </div>
+      </div>
+      <div class="sidebar-section-content">
+        <div class="range-filter" id="rangeFilters">
+        <button class="range-chip range-all active" data-range="all" onclick="setRangeFilter('all',this)">All Ranges</button>
+        <button class="range-chip" data-range="Sawatch" onclick="setRangeFilter('Sawatch',this)">Sawatch (15)</button>
+        <button class="range-chip" data-range="Front Range" onclick="setRangeFilter('Front Range',this)">Front Range (6)</button>
+        <button class="range-chip" data-range="Mosquito" onclick="setRangeFilter('Mosquito',this)">Mosquito (5)</button>
+        <button class="range-chip" data-range="Elk Mountains" onclick="setRangeFilter('Elk Mountains',this)">Elk Mountains (7)</button>
+        <button class="range-chip" data-range="Sangre de Cristo" onclick="setRangeFilter('Sangre de Cristo',this)">Sangre de Cristo (10)</button>
+        <button class="range-chip" data-range="San Juan" onclick="setRangeFilter('San Juan',this)">San Juan (15)</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section" data-section="show">
+      <div class="sidebar-section-header">
+        <h3>Show <span class="info-icon">i<span class="tooltip">Unclimbed only hides peaks you've already summited. Hide sub-peaks removes the 5 unofficial sub-summits from the traditional 58 list.</span></span></h3>
+        <div class="sidebar-section-toggle">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M3 4.5L6 7.5L9 4.5"/>
+          </svg>
+        </div>
+      </div>
+      <div class="sidebar-section-content">
+        <div class="filter-row">
+        <button class="filter-toggle" id="btnUnsummited" onclick="toggleUnsummitedOnly()">Unclimbed only</button>
+        <button class="filter-toggle" id="btnSubpeaks" onclick="toggleSubpeaks()">Hide sub-peaks</button>
+      </div>
+      </div>
+    </div>
+
+    <div class="peak-list-wrap" id="peakList"></div>
+  </div>
+
+  <!-- PANORAMA TAB -->
+  <div class="map-area" id="tabPanorama" style="display:none;">
+    <div class="panorama-container" id="panoramaContainer"></div>
+  </div>
+
+  <!-- MAP TAB -->
+  <div class="map-area" id="tabMap" style="position:relative;">
+    <div id="googleMapDiv" style="width:100%;height:100%;"></div>
+    <button id="mapReloadBtn" onclick="reloadMap()" title="Reload map" style="
+      position:absolute;bottom:16px;right:16px;z-index:10;
+      background:var(--panel);border:1px solid var(--border);
+      color:var(--muted);border-radius:6px;padding:6px 12px;
+      font-size:11px;cursor:pointer;display:flex;align-items:center;gap:6px;
+      transition:all .15s;font-family:inherit;">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <path d="M10 6A4 4 0 1 1 6 2M6 2l2 2M6 2L4 4"/>
+      </svg>
+      Reload map
+    </button>
+  </div>
+  
+  <!-- Keeping original SVG map hidden for now -->
+  <div style="display:none;">
+    <div class="map-container" id="mapContainer">
+      <svg id="mapSvg" viewBox="0 0 800 540" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- Glow filters -->
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="softglow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <!-- Terrain blur for smooth elevation fills -->
+          <filter id="terrainBlur" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="18"/>
+          </filter>
+
+          <!-- Base terrain gradient: dark teal plains fading to black at edges -->
+          <linearGradient id="terrainBase" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#07111a"/>
+            <stop offset="50%" stop-color="#09141f"/>
+            <stop offset="100%" stop-color="#060d14"/>
+          </linearGradient>
+
+          <!-- Eastern plains gradient (lighter/warmer right side) -->
+          <linearGradient id="plainsGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#07111a" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#0c1822" stop-opacity="0.6"/>
+          </linearGradient>
+
+          <!-- Elevation "heat" fill gradients per range (center brighter = higher elevation) -->
+          <radialGradient id="topoSawatch" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#2a5878" stop-opacity="0.55"/>
+            <stop offset="40%"  stop-color="#1e3f5a" stop-opacity="0.30"/>
+            <stop offset="100%" stop-color="#0d1f2e" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="topoFront" cx="50%" cy="40%" r="50%">
+            <stop offset="0%"   stop-color="#244d72" stop-opacity="0.45"/>
+            <stop offset="40%"  stop-color="#192f4a" stop-opacity="0.22"/>
+            <stop offset="100%" stop-color="#0d1520" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="topoPikes" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#244d72" stop-opacity="0.40"/>
+            <stop offset="100%" stop-color="#0d1520" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="topoMosquito" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#1f4a35" stop-opacity="0.50"/>
+            <stop offset="40%"  stop-color="#142e22" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="#0a1510" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="topoElk" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#3a3018" stop-opacity="0.55"/>
+            <stop offset="40%"  stop-color="#241e0f" stop-opacity="0.28"/>
+            <stop offset="100%" stop-color="#0d0b05" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="topoSanJuan" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#1e2060" stop-opacity="0.55"/>
+            <stop offset="40%"  stop-color="#12143c" stop-opacity="0.28"/>
+            <stop offset="100%" stop-color="#06070f" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="topoSangre" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#52201a" stop-opacity="0.50"/>
+            <stop offset="40%"  stop-color="#321310" stop-opacity="0.24"/>
+            <stop offset="100%" stop-color="#0e0604" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- ── BASE TERRAIN ─────────────────────────────── -->
+        <rect width="800" height="540" fill="url(#terrainBase)"/>
+        <!-- Plains lightening toward east -->
+        <rect width="800" height="540" fill="url(#plainsGrad)"/>
+
+        <!-- ── STATE BORDER ──────────────────────────────── -->
+        <path d="M 60,28 L 740,28 L 740,500 L 395,500 L 390,520 L 60,520 Z"
+          fill="rgba(255,255,255,0.012)" stroke="#2a3540" stroke-width="1.5" stroke-dasharray="5,4"/>
+
+        <!-- Lat/lon grid (very faint) -->
+        <g stroke="rgba(255,255,255,0.025)" stroke-width="0.8">
+          <!-- 39°N line (approx y≈192 for lat=39) -->
+          <line x1="60" y1="192" x2="740" y2="192"/>
+          <!-- 38°N line (approx y≈302) -->
+          <line x1="60" y1="302" x2="740" y2="302"/>
+          <!-- 40°N line (approx y≈82) -->
+          <line x1="60" y1="82" x2="740" y2="82"/>
+          <!-- 106°W approx x≈320 -->
+          <line x1="320" y1="28" x2="320" y2="520"/>
+          <!-- 104°W approx x≈503 -->
+          <line x1="503" y1="28" x2="503" y2="520"/>
+          <!-- 108°W approx x≈137 -->
+          <line x1="137" y1="28" x2="137" y2="520"/>
+        </g>
+        <!-- Grid labels -->
+        <g font-family="sans-serif" fill="rgba(100,120,140,0.3)" font-size="7.5">
+          <text x="62" y="189">39°N</text>
+          <text x="62" y="299">38°N</text>
+          <text x="62" y="79">40°N</text>
+          <text x="318" y="525" text-anchor="middle">106°W</text>
+          <text x="501" y="525" text-anchor="middle">104°W</text>
+          <text x="135" y="525" text-anchor="middle">108°W</text>
+        </g>
+
+        <!-- ── ELEVATION FILLS (blurred, smooth) ─────────── -->
+        <!-- These create the "raised terrain" look before contour lines -->
+        <!-- Sawatch: elongated N-S spine, center ~(320,264) -->
+        <ellipse cx="320" cy="264" rx="50" ry="130" fill="url(#topoSawatch)" filter="url(#terrainBlur)"/>
+        <!-- Front Range: two lobes -->
+        <ellipse cx="393" cy="185" rx="55" ry="95" fill="url(#topoFront)" filter="url(#terrainBlur)"/>
+        <ellipse cx="444" cy="281" rx="40" ry="40" fill="url(#topoPikes)" filter="url(#terrainBlur)"/>
+        <!-- Mosquito -->
+        <ellipse cx="345" cy="224" rx="38" ry="50" fill="url(#topoMosquito)" filter="url(#terrainBlur)"/>
+        <!-- Elk Mountains -->
+        <ellipse cx="268" cy="257" rx="58" ry="50" fill="url(#topoElk)" filter="url(#terrainBlur)"/>
+        <!-- San Juan: wide complex -->
+        <ellipse cx="196" cy="375" rx="105" ry="72" fill="url(#topoSanJuan)" filter="url(#terrainBlur)"/>
+        <!-- Sangre de Cristo: tall N-S spine -->
+        <ellipse cx="406" cy="415" rx="40" ry="95" fill="url(#topoSangre)" filter="url(#terrainBlur)"/>
+
+        <!-- ── TOPOGRAPHIC CONTOUR LINES ──────────────────── -->
+        <!-- Each range: 7 concentric rings, inner = brighter/closer spacing -->
+        <!-- Stroke opacity increases toward center to simulate elevation gain -->
+
+        <!-- SAWATCH (narrow N-S spine) -->
+        <g fill="none">
+          <ellipse cx="320" cy="264" rx="78" ry="175" stroke="rgba(110,155,200,0.07)" stroke-width="0.8"/>
+          <ellipse cx="320" cy="264" rx="64" ry="148" stroke="rgba(115,162,208,0.09)" stroke-width="0.8"/>
+          <ellipse cx="320" cy="264" rx="51" ry="122" stroke="rgba(122,170,215,0.11)" stroke-width="0.8"/>
+          <ellipse cx="320" cy="264" rx="39" ry="97"  stroke="rgba(130,178,222,0.14)" stroke-width="0.7"/>
+          <ellipse cx="320" cy="264" rx="28" ry="73"  stroke="rgba(140,188,230,0.17)" stroke-width="0.7"/>
+          <ellipse cx="320" cy="264" rx="18" ry="50"  stroke="rgba(152,200,238,0.21)" stroke-width="0.8"/>
+          <ellipse cx="320" cy="264" rx="9"  ry="28"  stroke="rgba(170,215,248,0.28)" stroke-width="0.9"/>
+          <!-- Summit zone highlight -->
+          <ellipse cx="320" cy="264" rx="4"  ry="14"  stroke="rgba(200,235,255,0.38)" stroke-width="1" stroke-dasharray="2,3"/>
+        </g>
+
+        <!-- FRONT RANGE NORTH (Longs → Evans → Bierstadt cluster) -->
+        <g fill="none">
+          <ellipse cx="393" cy="185" rx="80" ry="105" stroke="rgba(110,155,200,0.07)" stroke-width="0.8"/>
+          <ellipse cx="393" cy="185" rx="66" ry="88"  stroke="rgba(115,162,208,0.09)" stroke-width="0.8"/>
+          <ellipse cx="393" cy="185" rx="53" ry="72"  stroke="rgba(122,170,215,0.11)" stroke-width="0.8"/>
+          <ellipse cx="393" cy="185" rx="41" ry="57"  stroke="rgba(130,178,222,0.14)" stroke-width="0.7"/>
+          <ellipse cx="393" cy="185" rx="30" ry="43"  stroke="rgba(140,188,230,0.17)" stroke-width="0.7"/>
+          <ellipse cx="393" cy="185" rx="20" ry="30"  stroke="rgba(152,200,238,0.21)" stroke-width="0.8"/>
+          <ellipse cx="393" cy="185" rx="10" ry="16"  stroke="rgba(170,215,248,0.28)" stroke-width="0.9"/>
+          <ellipse cx="393" cy="185" rx="4"  ry="7"   stroke="rgba(200,235,255,0.38)" stroke-width="1" stroke-dasharray="2,3"/>
+        </g>
+
+        <!-- PIKES PEAK (isolated southern Front Range) -->
+        <g fill="none">
+          <ellipse cx="444" cy="281" rx="58" ry="55"  stroke="rgba(110,155,200,0.07)" stroke-width="0.8"/>
+          <ellipse cx="444" cy="281" rx="46" ry="44"  stroke="rgba(118,165,210,0.10)" stroke-width="0.8"/>
+          <ellipse cx="444" cy="281" rx="35" ry="33"  stroke="rgba(128,175,220,0.13)" stroke-width="0.7"/>
+          <ellipse cx="444" cy="281" rx="24" ry="23"  stroke="rgba(140,188,230,0.17)" stroke-width="0.7"/>
+          <ellipse cx="444" cy="281" rx="15" ry="14"  stroke="rgba(155,203,240,0.21)" stroke-width="0.8"/>
+          <ellipse cx="444" cy="281" rx="7"  ry="7"   stroke="rgba(175,218,250,0.28)" stroke-width="0.9"/>
+          <ellipse cx="444" cy="281" rx="3"  ry="3"   stroke="rgba(205,238,255,0.38)" stroke-width="1" stroke-dasharray="2,2"/>
+        </g>
+
+        <!-- MOSQUITO RANGE (tight cluster) -->
+        <g fill="none">
+          <ellipse cx="345" cy="224" rx="62" ry="70"  stroke="rgba(110,185,150,0.07)" stroke-width="0.8"/>
+          <ellipse cx="345" cy="224" rx="50" ry="57"  stroke="rgba(115,190,155,0.09)" stroke-width="0.8"/>
+          <ellipse cx="345" cy="224" rx="39" ry="45"  stroke="rgba(122,198,162,0.11)" stroke-width="0.8"/>
+          <ellipse cx="345" cy="224" rx="29" ry="34"  stroke="rgba(130,206,170,0.14)" stroke-width="0.7"/>
+          <ellipse cx="345" cy="224" rx="20" ry="24"  stroke="rgba(140,215,180,0.17)" stroke-width="0.7"/>
+          <ellipse cx="345" cy="224" rx="12" ry="15"  stroke="rgba(153,224,190,0.21)" stroke-width="0.8"/>
+          <ellipse cx="345" cy="224" rx="5"  ry="7"   stroke="rgba(170,235,205,0.28)" stroke-width="0.9"/>
+        </g>
+
+        <!-- ELK MOUNTAINS (wide E-W, shorter N-S) -->
+        <g fill="none">
+          <ellipse cx="268" cy="257" rx="88" ry="72"  stroke="rgba(185,155,110,0.07)" stroke-width="0.8"/>
+          <ellipse cx="268" cy="257" rx="73" ry="59"  stroke="rgba(190,162,118,0.09)" stroke-width="0.8"/>
+          <ellipse cx="268" cy="257" rx="59" ry="48"  stroke="rgba(198,170,128,0.11)" stroke-width="0.8"/>
+          <ellipse cx="268" cy="257" rx="46" ry="37"  stroke="rgba(206,178,138,0.14)" stroke-width="0.7"/>
+          <ellipse cx="268" cy="257" rx="34" ry="27"  stroke="rgba(215,188,150,0.17)" stroke-width="0.7"/>
+          <ellipse cx="268" cy="257" rx="22" ry="18"  stroke="rgba(225,200,163,0.21)" stroke-width="0.8"/>
+          <ellipse cx="268" cy="257" rx="11" ry="9"   stroke="rgba(238,215,178,0.28)" stroke-width="0.9"/>
+          <ellipse cx="268" cy="257" rx="4"  ry="3"   stroke="rgba(252,232,200,0.38)" stroke-width="1" stroke-dasharray="2,2"/>
+        </g>
+
+        <!-- SAN JUAN MOUNTAINS (large complex, shifted west & south) -->
+        <g fill="none">
+          <ellipse cx="196" cy="375" rx="135" ry="98"  stroke="rgba(130,130,200,0.07)" stroke-width="0.8"/>
+          <ellipse cx="196" cy="375" rx="115" ry="82"  stroke="rgba(135,138,208,0.09)" stroke-width="0.8"/>
+          <ellipse cx="196" cy="375" rx="96"  ry="67"  stroke="rgba(142,146,216,0.11)" stroke-width="0.8"/>
+          <ellipse cx="196" cy="375" rx="78"  ry="54"  stroke="rgba(150,154,224,0.14)" stroke-width="0.7"/>
+          <ellipse cx="196" cy="375" rx="61"  ry="41"  stroke="rgba(160,163,232,0.17)" stroke-width="0.7"/>
+          <ellipse cx="196" cy="375" rx="44"  ry="29"  stroke="rgba(172,174,240,0.21)" stroke-width="0.8"/>
+          <ellipse cx="196" cy="375" rx="28"  ry="18"  stroke="rgba(188,190,250,0.28)" stroke-width="0.9"/>
+          <ellipse cx="196" cy="375" rx="13"  ry="8"   stroke="rgba(208,210,255,0.36)" stroke-width="1" stroke-dasharray="2,3"/>
+        </g>
+
+        <!-- SANGRE DE CRISTO (long N-S ridge, tilted slightly) -->
+        <g fill="none">
+          <ellipse cx="406" cy="415" rx="68" ry="128"  stroke="rgba(200,120,110,0.07)" stroke-width="0.8"/>
+          <ellipse cx="406" cy="415" rx="57" ry="108"  stroke="rgba(205,128,118,0.09)" stroke-width="0.8"/>
+          <ellipse cx="406" cy="415" rx="46" ry="88"   stroke="rgba(212,138,128,0.11)" stroke-width="0.8"/>
+          <ellipse cx="406" cy="415" rx="36" ry="69"   stroke="rgba(220,148,138,0.14)" stroke-width="0.7"/>
+          <ellipse cx="406" cy="415" rx="26" ry="51"   stroke="rgba(228,160,150,0.17)" stroke-width="0.7"/>
+          <ellipse cx="406" cy="415" rx="17" ry="35"   stroke="rgba(238,173,163,0.21)" stroke-width="0.8"/>
+          <ellipse cx="406" cy="415" rx="8"  ry="18"   stroke="rgba(250,190,180,0.28)" stroke-width="0.9"/>
+          <ellipse cx="406" cy="415" rx="3"  ry="8"    stroke="rgba(255,210,205,0.36)" stroke-width="1" stroke-dasharray="2,3"/>
+        </g>
+
+        <!-- ── RANGE LABELS ───────────────────────────────── -->
+        <g font-family="-apple-system, sans-serif" fill="rgba(139,148,158,0.30)" font-size="8.5" letter-spacing="1.4">
+          <text x="320" y="140" text-anchor="middle">SAWATCH RANGE</text>
+          <text x="390" y="108" text-anchor="middle">FRONT RANGE</text>
+          <text x="345" y="160" text-anchor="middle">MOSQUITO</text>
+          <text x="268" y="188" text-anchor="middle">ELK MOUNTAINS</text>
+          <text x="196" y="468" text-anchor="middle">SAN JUAN MTS</text>
+          <text x="410" y="506" text-anchor="middle">SANGRE DE CRISTO</text>
+        </g>
+
+        <!-- ── COMPASS ROSE ───────────────────────────────── -->
+        <g transform="translate(720, 52)">
+          <circle r="17" fill="rgba(13,17,23,.85)" stroke="rgba(42,53,64,.9)" stroke-width="1"/>
+          <text y="-6" text-anchor="middle" fill="rgba(150,170,190,.85)" font-size="8.5" font-weight="700" font-family="sans-serif">N</text>
+          <text y="13" text-anchor="middle" fill="rgba(100,120,140,.5)" font-size="7" font-family="sans-serif">S</text>
+          <text x="11" y="4" text-anchor="middle" fill="rgba(100,120,140,.5)" font-size="7" font-family="sans-serif">E</text>
+          <text x="-11" y="4" text-anchor="middle" fill="rgba(100,120,140,.5)" font-size="7" font-family="sans-serif">W</text>
+          <polygon points="0,-13 2.5,-5 0,-8 -2.5,-5" fill="rgba(150,180,220,.7)"/>
+          <polygon points="0,13 2.5,5 0,8 -2.5,5" fill="rgba(80,100,120,.4)"/>
+        </g>
+
+        <!-- ── SCALE BAR ──────────────────────────────────── -->
+        <g transform="translate(63, 512)">
+          <rect x="0" y="-4" width="62" height="8" rx="1" fill="rgba(13,17,23,.7)" stroke="rgba(42,53,64,.6)" stroke-width="0.5"/>
+          <line x1="0" y1="0" x2="62" y2="0" stroke="rgba(139,148,158,.5)" stroke-width="1.5"/>
+          <line x1="0" y1="-2.5" x2="0" y2="2.5" stroke="rgba(139,148,158,.5)" stroke-width="1.5"/>
+          <line x1="31" y1="-1.5" x2="31" y2="1.5" stroke="rgba(139,148,158,.4)" stroke-width="1"/>
+          <line x1="62" y1="-2.5" x2="62" y2="2.5" stroke="rgba(139,148,158,.5)" stroke-width="1.5"/>
+          <text x="31" y="-7" text-anchor="middle" fill="rgba(139,148,158,.5)" font-size="7.5" font-family="sans-serif">≈ 50 miles</text>
+        </g>
+
+        <!-- Peaks layer (populated by JS) -->
+        <g id="peaksLayer"></g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- LIST TAB -->
+  <div class="map-area" id="tabList" style="display:none;">
+    <div class="list-view-container">
+      <table class="list-table">
+        <thead>
+          <tr>
+            <th style="width:28px"></th>
+            <th onclick="sortBy('name')">Peak ↕</th>
+            <th onclick="sortBy('elev')">Elevation ↕</th>
+            <th>Class</th>
+            <th>Range</th>
+            <th>Season</th>
+            <th>Miles</th>
+            <th>Gain (ft)</th>
+            <th>Rating</th>
+          </tr>
+        </thead>
+        <tbody id="listBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DETAIL PANEL -->
+  <div class="detail-panel">
+    <div class="detail-empty" id="detailEmpty">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+        <path d="M8 38 L18 18 L24 28 L30 14 L40 38 Z" fill="none" stroke="#26c6da" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="24" cy="9" r="3" fill="#26c6da" opacity="0.5"/>
+        <circle cx="24" cy="9" r="5" fill="none" stroke="#26c6da" stroke-width="1" opacity="0.2"/>
+      </svg>
+      <div style="font-weight:600; color:var(--muted)">Select a peak</div>
+      <div style="font-size:11px; color:var(--muted); opacity:.7; margin-bottom: 12px">Click any peak on the map or list to see trail details</div>
+      <div style="font-size:10px; color:rgba(74,222,128,0.8); padding: 8px 12px; background: rgba(74,222,128,0.08); border-radius: 6px; border: 1px solid rgba(74,222,128,0.2); line-height: 1.5;">
+        <strong>Planning a hike?</strong> Check out <a href="https://www.alltrails.com" target="_blank" rel="noopener" style="color: #4ade80; text-decoration: none; border-bottom: 1px solid rgba(74,222,128,0.3)">AllTrails</a> for detailed maps, conditions, and reviews.
+      </div>
+    </div>
+    <div class="detail-content" id="detailContent" style="display:none"></div>
+  </div>
+  
+  <!-- COLLAPSE BUTTONS (fixed position) -->
+  <button class="collapse-btn collapse-btn-left" id="btnCollapseSidebar" title="Collapse sidebar">
+    ‹
+  </button>
+  <button class="collapse-btn collapse-btn-right" id="btnCollapseDetail" title="Collapse detail panel">
+    ›
+  </button>
+</main>
+
+<div id="tooltip"></div>
+
+<script>
+// ============================================================
+// DATA: 58 Colorado 14ers
+// Sources: 14ers.com, USGS, AllTrails
+// ============================================================
+
+const CLASS_PREP = {
+  1: "A straightforward trail hike on well-maintained paths. No technical skills required. Essential gear: sturdy hiking boots, layered clothing, sun protection, 3+ liters water, snacks, and a headlamp. Start early (3–5am) to summit before afternoon thunderstorms — Colorado's #1 hazard. Turn around by noon if storms threaten.",
+  2: "Off-trail hiking with some boulder scrambling. Basic route-finding skills and comfort moving over loose rock required. Trekking poles highly recommended. Same weather rules apply — afternoon thunderstorms are serious above treeline. Helmets useful on some routes. A slip on steeper sections could cause injury.",
+  3: "Sustained hands-on scrambling with significant exposure. Comfort on steep rocky terrain is essential. A fall could be serious or fatal. Move confidently before committing to Class 3 terrain. Some mountaineers use a rope for security. Helmet strongly recommended. Only attempt in stable weather.",
+  4: "Technical climbing involving severe exposure. A rope and basic climbing protection is strongly recommended even for experienced mountaineers. Falls are likely fatal. Prior rock climbing experience is essential. These peaks demand respect — multiple fatalities occur each year. Never solo if inexperienced."
+};
+
+const PEAKS = [
+  // ── SAWATCH RANGE (15) ──────────────────────────────────
+  { id:1,  name:"Mount Elbert",            elev:14440, cls:1, range:"Sawatch",         lat:39.1178, lng:-106.4453, season:"Jun–Oct", slug:"north-mount-elbert-trail--3",                     rating:4.8, miles:9.9,  gain:4458, sub:false },
+  { id:2,  name:"Mount Massive",           elev:14421, cls:1, range:"Sawatch",         lat:39.1875, lng:-106.4753, season:"Jun–Oct", slug:"mount-massive-trail",                              rating:4.8, miles:13.6, gain:4700, sub:false },
+  { id:3,  name:"Mount Harvard",           elev:14420, cls:2, range:"Sawatch",         lat:38.9244, lng:-106.3203, season:"Jun–Oct", slug:"mount-harvard-trail",                              rating:4.8, miles:14.0, gain:4500, sub:false },
+  { id:4,  name:"La Plata Peak",           elev:14361, cls:2, range:"Sawatch",         lat:38.9672, lng:-106.4731, season:"Jun–Oct", slug:"la-plata-peak-trail",                              rating:4.8, miles:10.0, gain:3500, sub:false },
+  { id:5,  name:"Mount Antero",            elev:14269, cls:2, range:"Sawatch",         lat:38.6742, lng:-106.2461, season:"Jul–Sep", slug:"mount-antero-trail",                               rating:4.7, miles:14.0, gain:3700, sub:false },
+  { id:6,  name:"Mount Shavano",           elev:14229, cls:2, range:"Sawatch",         lat:38.6192, lng:-106.2394, season:"Jun–Sep", slug:"mount-shavano-and-tabeguache-peak-trail",          rating:4.8, miles:10.5, gain:4200, sub:false },
+  { id:7,  name:"Tabeguache Peak",         elev:14155, cls:2, range:"Sawatch",         lat:38.6253, lng:-106.2503, season:"Jun–Sep", slug:"mount-shavano-and-tabeguache-peak-trail",          rating:4.8, miles:10.5, gain:4200, sub:false },
+  { id:8,  name:"Mount Princeton",         elev:14204, cls:2, range:"Sawatch",         lat:38.7492, lng:-106.2422, season:"Jun–Oct", slug:"mount-princeton-trail",                            rating:4.7, miles:8.0,  gain:4300, sub:false },
+  { id:9,  name:"Mount Yale",              elev:14196, cls:2, range:"Sawatch",         lat:38.8442, lng:-106.3142, season:"Jun–Oct", slug:"mount-yale-trail",                                 rating:4.8, miles:9.0,  gain:4100, sub:false },
+  { id:10, name:"Mount Belford",           elev:14197, cls:2, range:"Sawatch",         lat:38.9608, lng:-106.3603, season:"Jun–Oct", slug:"mount-belford-trail",                              rating:4.8, miles:7.5,  gain:3800, sub:false },
+  { id:11, name:"Mount Oxford",            elev:14153, cls:2, range:"Sawatch",         lat:38.9650, lng:-106.3383, season:"Jun–Oct", slug:"mount-belford-and-mount-oxford-trail",             rating:4.8, miles:10.0, gain:4500, sub:false },
+  { id:12, name:"Missouri Mountain",       elev:14067, cls:2, range:"Sawatch",         lat:38.9467, lng:-106.3783, season:"Jun–Oct", slug:"missouri-mountain-trail",                          rating:4.7, miles:8.0,  gain:3500, sub:false },
+  { id:13, name:"Huron Peak",              elev:14003, cls:2, range:"Sawatch",         lat:38.9456, lng:-106.4342, season:"Jun–Oct", slug:"huron-peak-trail",                                 rating:4.8, miles:6.5,  gain:2800, sub:false },
+  { id:14, name:"Mount Columbia",          elev:14073, cls:2, range:"Sawatch",         lat:38.9036, lng:-106.2983, season:"Jun–Oct", slug:"mount-columbia-trail",                             rating:4.7, miles:11.0, gain:4100, sub:false },
+  { id:15, name:"Mount of the Holy Cross", elev:14005, cls:2, range:"Sawatch",         lat:39.4667, lng:-106.4819, season:"Jul–Sep", slug:"mount-of-the-holy-cross-trail",                    rating:4.9, miles:12.0, gain:5700, sub:false },
+
+  // ── FRONT RANGE (6) ─────────────────────────────────────
+  { id:16, name:"Grays Peak",              elev:14278, cls:1, range:"Front Range",     lat:39.6341, lng:-105.7758, season:"Jun–Oct", slug:"grays-and-torreys-peak",                           rating:4.8, miles:8.0,  gain:3000, sub:false },
+  { id:17, name:"Torreys Peak",            elev:14267, cls:1, range:"Front Range",     lat:39.6428, lng:-105.8211, season:"Jun–Oct", slug:"grays-and-torreys-peak",                           rating:4.8, miles:8.0,  gain:3000, sub:false },
+  { id:18, name:"Mount Evans",             elev:14264, cls:1, range:"Front Range",     lat:39.5883, lng:-105.6433, season:"Jun–Oct", slug:"mount-blue-sky-summit-trail",                      rating:4.7, miles:13.5, gain:2850, sub:false, note:"Also known as Mt. Blue Sky. Highest paved road in the US nearby." },
+  { id:19, name:"Longs Peak",              elev:14259, cls:3, range:"Front Range",     lat:40.2550, lng:-105.6150, season:"Jul–Sep", slug:"the-keyhole-and-longs-peak-trail",                 rating:4.8, miles:13.6, gain:4934, sub:false, note:"Most technical Front Range 14er. The Keyhole Route is Class 3. Early start (2–3am) required." },
+  { id:20, name:"Mount Bierstadt",         elev:14060, cls:1, range:"Front Range",     lat:39.5836, lng:-105.7086, season:"Jun–Oct", slug:"mount-bierstadt-trail",                            rating:4.7, miles:7.0,  gain:2850, sub:false, note:"One of the most popular beginner-friendly 14ers near Denver." },
+  { id:21, name:"Pikes Peak",              elev:14115, cls:1, range:"Front Range",     lat:38.8409, lng:-105.0423, season:"Jun–Oct", slug:"pikes-peak-via-barr-trail--2",                     rating:4.8, miles:24.2, gain:7444, sub:false, note:"Iconic summit. Accessible by cog railway or car road. Barr Trail is the classic hike route." },
+
+  // ── MOSQUITO RANGE (5) ──────────────────────────────────
+  { id:22, name:"Mount Lincoln",           elev:14286, cls:1, range:"Mosquito",        lat:39.3514, lng:-106.1117, season:"Jun–Oct", slug:"mount-lincoln-and-mount-democrat-trail",           rating:4.8, miles:7.0,  gain:2900, sub:false },
+  { id:23, name:"Quandary Peak",           elev:14265, cls:1, range:"Mosquito",        lat:39.3972, lng:-106.1061, season:"Jun–Oct", slug:"quandary-peak-trail",                              rating:4.7, miles:6.75, gain:3450, sub:false, note:"Most popular 14er in Colorado. Perfect beginner peak with a well-maintained trail." },
+  { id:24, name:"Mount Democrat",          elev:14148, cls:1, range:"Mosquito",        lat:39.3400, lng:-106.1411, season:"Jun–Oct", slug:"mount-democrat-trail",                             rating:4.8, miles:7.0,  gain:2900, sub:false },
+  { id:25, name:"Mount Cameron",           elev:14238, cls:1, range:"Mosquito",        lat:39.3478, lng:-106.1200, season:"Jun–Oct", slug:"mount-lincoln-and-mount-democrat-trail",           rating:4.8, miles:8.0,  gain:3100, sub:true,  note:"Sub-peak of Mount Lincoln. Often bagged en route between Lincoln and Democrat." },
+  { id:26, name:"Mount Bross",             elev:14172, cls:2, range:"Mosquito",        lat:39.3317, lng:-106.1131, season:"Jun–Oct", slug:"mount-bross-trail",                                rating:4.6, miles:6.0,  gain:2700, sub:false },
+
+  // ── ELK MOUNTAINS (7) ───────────────────────────────────
+  { id:27, name:"Castle Peak",             elev:14265, cls:2, range:"Elk Mountains",   lat:38.9978, lng:-106.8636, season:"Jul–Sep", slug:"castle-and-conundrum-peak-trail",                  rating:4.8, miles:11.0, gain:4200, sub:false },
+  { id:28, name:"Conundrum Peak",          elev:14060, cls:2, range:"Elk Mountains",   lat:38.9872, lng:-106.8683, season:"Jul–Sep", slug:"castle-and-conundrum-peak-trail",                  rating:4.7, miles:12.0, gain:4400, sub:true,  note:"Sub-peak of Castle Peak. Usually climbed together." },
+  { id:29, name:"Maroon Peak",             elev:14163, cls:3, range:"Elk Mountains",   lat:39.0706, lng:-106.9878, season:"Jul–Sep", slug:"south-maroon-peak-trail",                          rating:4.9, miles:10.5, gain:3800, sub:false, note:"Part of the iconic Maroon Bells. Known as 'The Deadly Bells' for good reason — loose, rotten rock." },
+  { id:30, name:"North Maroon Peak",       elev:14014, cls:4, range:"Elk Mountains",   lat:39.0719, lng:-106.9886, season:"Jul–Sep", slug:"north-maroon-peak-trail",                          rating:4.9, miles:9.5,  gain:3600, sub:true,  note:"Sub-peak of Maroon Peak. One of the most dangerous 14ers due to loose conglomerate rock." },
+  { id:31, name:"Pyramid Peak",            elev:14018, cls:4, range:"Elk Mountains",   lat:39.0717, lng:-106.9503, season:"Jul–Sep", slug:"pyramid-peak-trail",                               rating:4.9, miles:7.5,  gain:3800, sub:false, note:"Extremely loose and dangerous. Not recommended for beginners. One of the most technical 14ers." },
+  { id:32, name:"Capitol Peak",            elev:14130, cls:4, range:"Elk Mountains",   lat:39.1503, lng:-107.0828, season:"Jul–Sep", slug:"capitol-peak-trail",                               rating:4.9, miles:16.0, gain:5200, sub:false, note:"Considered the most difficult 14er. The Knife Edge — a 3 ft wide ridge with 1,000 ft drops on each side — is legendary." },
+  { id:33, name:"Snowmass Mountain",       elev:14092, cls:3, range:"Elk Mountains",   lat:39.1197, lng:-107.0667, season:"Jul–Sep", slug:"snowmass-mountain-trail",                          rating:4.8, miles:18.0, gain:5800, sub:false, note:"Long approach through Snowmass Lake basin. Technically moderate but the distance makes it committing." },
+
+  // ── SANGRE DE CRISTO (10) ───────────────────────────────
+  { id:34, name:"Blanca Peak",             elev:14345, cls:2, range:"Sangre de Cristo", lat:37.5775, lng:-105.4853, season:"Jun–Oct", slug:"blanca-peak-trail",                              rating:4.8, miles:12.0, gain:5200, sub:false, note:"4th highest in Colorado. Requires a high-clearance vehicle to reach the Lake Como trailhead." },
+  { id:35, name:"Crestone Peak",           elev:14294, cls:3, range:"Sangre de Cristo", lat:37.9669, lng:-105.5853, season:"Jul–Sep", slug:"crestone-peak-trail",                            rating:4.9, miles:8.5,  gain:4500, sub:false, note:"The Couloir Route is the standard approach. Solid Class 3 with significant exposure." },
+  { id:36, name:"Crestone Needle",         elev:14197, cls:4, range:"Sangre de Cristo", lat:37.9647, lng:-105.5767, season:"Jul–Sep", slug:"crestone-needle-trail",                          rating:4.9, miles:8.5,  gain:4300, sub:false, note:"Technical Class 4 requiring solid rock skills. Often roped by experienced climbers." },
+  { id:37, name:"Kit Carson Peak",         elev:14165, cls:4, range:"Sangre de Cristo", lat:37.9797, lng:-105.6028, season:"Jul–Sep", slug:"kit-carson-peak-trail",                          rating:4.9, miles:9.0,  gain:4700, sub:false },
+  { id:38, name:"Challenger Point",        elev:14081, cls:3, range:"Sangre de Cristo", lat:37.9803, lng:-105.6075, season:"Jul–Sep", slug:"challenger-point-and-kit-carson-peak-trail",     rating:4.9, miles:9.5,  gain:4800, sub:true,  note:"Sub-peak of Kit Carson. Named in honor of the Space Shuttle Challenger crew. Often climbed as a pair." },
+  { id:39, name:"Little Bear Peak",        elev:14037, cls:4, range:"Sangre de Cristo", lat:37.5661, lng:-105.4969, season:"Jul–Sep", slug:"little-bear-peak-trail",                         rating:4.9, miles:11.0, gain:5100, sub:false, note:"One of the hardest 14ers. The upper couloir and exposed ridge require solid Class 4 climbing." },
+  { id:40, name:"Mount Lindsey",           elev:14042, cls:2, range:"Sangre de Cristo", lat:37.5836, lng:-105.4444, season:"Jun–Oct", slug:"mount-lindsey-trail",                            rating:4.7, miles:8.0,  gain:3300, sub:false },
+  { id:41, name:"Ellingwood Point",        elev:14042, cls:2, range:"Sangre de Cristo", lat:37.5822, lng:-105.4919, season:"Jun–Oct", slug:"ellingwood-point-trail",                         rating:4.8, miles:12.5, gain:5500, sub:false, note:"Usually climbed with Blanca Peak from Lake Como. Rocky Class 2 ridge." },
+  { id:42, name:"Humboldt Peak",           elev:14064, cls:2, range:"Sangre de Cristo", lat:37.9761, lng:-105.5561, season:"Jun–Oct", slug:"humboldt-peak-trail",                            rating:4.7, miles:8.5,  gain:3400, sub:false },
+  { id:43, name:"Culebra Peak",            elev:14053, cls:2, range:"Sangre de Cristo", lat:37.1219, lng:-105.1856, season:"Jun–Oct", slug:"culebra-peak-trail",                             rating:4.7, miles:8.0,  gain:2900, sub:false, note:"On private ranch land — requires a permit/fee from Taylor Ranch. Southernmost Colorado 14er." },
+
+  // ── SAN JUAN MOUNTAINS (15) ─────────────────────────────
+  { id:44, name:"Uncompahgre Peak",        elev:14309, cls:2, range:"San Juan",         lat:38.0717, lng:-107.4619, season:"Jun–Oct", slug:"uncompahgre-peak-trail",                         rating:4.9, miles:7.5,  gain:2900, sub:false, note:"Highest San Juan peak and one of the most straightforward. Broad summit plateau with incredible views." },
+  { id:45, name:"Mount Wilson",            elev:14252, cls:4, range:"San Juan",         lat:37.8389, lng:-107.9913, season:"Jul–Sep", slug:"mount-wilson-trail",                             rating:4.9, miles:16.0, gain:5500, sub:false, note:"Remote and technical. Long approach. Often combined with El Diente via the traverse." },
+  { id:46, name:"El Diente Peak",          elev:14159, cls:4, range:"San Juan",         lat:37.8383, lng:-108.0056, season:"Jul–Sep", slug:"el-diente-peak-trail",                           rating:4.9, miles:16.5, gain:5600, sub:false, note:"Westernmost 14er. The traverse to Mount Wilson is one of the most coveted routes in Colorado." },
+  { id:47, name:"Mount Sneffels",          elev:14150, cls:2, range:"San Juan",         lat:38.0033, lng:-107.7928, season:"Jul–Sep", slug:"mount-sneffels-trail",                           rating:4.9, miles:5.5,  gain:2900, sub:false, note:"One of the most scenic 14ers. Short but steep couloir approach. Stunning Yankee Boy Basin." },
+  { id:48, name:"Mount Eolus",             elev:14083, cls:3, range:"San Juan",         lat:37.6214, lng:-107.6219, season:"Jul–Sep", slug:"mount-eolus-trail",                              rating:4.9, miles:14.0, gain:4300, sub:false, note:"Requires the Durango-Silverton Narrow Gauge Railroad to reach the Needleton trailhead. Remote and spectacular." },
+  { id:49, name:"Windom Peak",             elev:14082, cls:2, range:"San Juan",         lat:37.6200, lng:-107.5917, season:"Jul–Sep", slug:"windom-peak-trail",                              rating:4.9, miles:14.5, gain:4400, sub:false, note:"Chicago Basin peak. Usually combined with Sunlight and/or Eolus. Requires train access." },
+  { id:50, name:"Sunlight Peak",           elev:14059, cls:4, range:"San Juan",         lat:37.6272, lng:-107.5944, season:"Jul–Sep", slug:"sunlight-peak-trail",                            rating:4.9, miles:15.0, gain:4500, sub:false, note:"The summit block requires a Class 4 move. Deceptively committing for its size. Requires train access." },
+  { id:51, name:"Handies Peak",            elev:14048, cls:2, range:"San Juan",         lat:37.9133, lng:-107.5042, season:"Jun–Oct", slug:"handies-peak-trail",                             rating:4.9, miles:5.5,  gain:2600, sub:false, note:"One of the most accessible San Juan 14ers. Relatively short hike with good trail." },
+  { id:52, name:"Wetterhorn Peak",         elev:14015, cls:3, range:"San Juan",         lat:38.0608, lng:-107.5103, season:"Jul–Sep", slug:"wetterhorn-peak-trail",                          rating:4.9, miles:9.5,  gain:3300, sub:false },
+  { id:53, name:"Redcloud Peak",           elev:14034, cls:2, range:"San Juan",         lat:37.9406, lng:-107.4222, season:"Jun–Oct", slug:"redcloud-and-sunshine-peak-trail",               rating:4.8, miles:9.0,  gain:3700, sub:false },
+  { id:54, name:"Sunshine Peak",           elev:14001, cls:2, range:"San Juan",         lat:37.9239, lng:-107.4228, season:"Jun–Oct", slug:"redcloud-and-sunshine-peak-trail",               rating:4.8, miles:9.0,  gain:3700, sub:false, note:"Lowest-elevation 14er (14,001 ft). Usually paired with Redcloud Peak." },
+  { id:55, name:"Wilson Peak",             elev:14017, cls:3, range:"San Juan",         lat:37.8597, lng:-107.9844, season:"Jul–Sep", slug:"wilson-peak-trail",                              rating:4.8, miles:9.5,  gain:3400, sub:false, note:"Part of the iconic Lizard Head Wilderness. More accessible than Mt. Wilson but still technical." },
+  { id:56, name:"San Luis Peak",           elev:14014, cls:2, range:"San Juan",         lat:37.9878, lng:-106.9317, season:"Jun–Oct", slug:"san-luis-peak-trail",                            rating:4.8, miles:9.0,  gain:3100, sub:false, note:"Northernmost San Juan 14er. Gentler terrain than many San Juans — a good entry point." },
+  { id:57, name:"North Eolus",             elev:14039, cls:3, range:"San Juan",         lat:37.6242, lng:-107.6256, season:"Jul–Sep", slug:"mount-eolus-and-north-eolus-trail",              rating:4.9, miles:14.0, gain:4300, sub:true,  note:"Sub-peak of Mt. Eolus. The traverse between the two is Class 3 with exposure." },
+  { id:58, name:"Stewart Peak",            elev:14036, cls:2, range:"San Juan",         lat:37.9967, lng:-107.0097, season:"Jun–Oct", slug:"stewart-peak-trail",                             rating:4.6, miles:8.0,  gain:2800, sub:false },
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let summited = JSON.parse(localStorage.getItem('co14ers_summited') || '[]');
+let selectedId = null;
+let activeClasses = new Set([1, 2, 3, 4]);
+let activeRange = 'all';
+let unsummitedOnly = false;
+let hideSubpeaks = false;
+let currentTab = 'map';
+let sortKey = 'elev';
+let sortDir = -1; // descending by default
+
+// ============================================================
+// COORDINATE TRANSFORMS
+// ============================================================
+// Colorado: lat 36.80–41.10, lng -109.20 to -101.90
+const MAP_W = 800, MAP_H = 540;
+const LAT_MIN = 36.75, LAT_MAX = 41.15;
+const LNG_MIN = -109.25, LNG_MAX = -101.80;
+const PAD_L = 60, PAD_R = 60, PAD_T = 28, PAD_B = 30;
+
+function lngToX(lng) {
+  return PAD_L + (lng - LNG_MIN) / (LNG_MAX - LNG_MIN) * (MAP_W - PAD_L - PAD_R);
+}
+function latToY(lat) {
+  return PAD_T + (1 - (lat - LAT_MIN) / (LAT_MAX - LAT_MIN)) * (MAP_H - PAD_T - PAD_B);
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function classColor(c) {
+  return ['','#22c55e','#eab308','#f97316','#ef4444'][c];
+}
+function classLabel(c) { return 'Class ' + c; }
+function stars(r) { return '★'.repeat(Math.round(r)) + '☆'.repeat(5-Math.round(r)); }
+function isSummited(id) { return summited.includes(id); }
+
+function toggleSummit(id) {
+  if (summited.includes(id)) {
+    summited = summited.filter(x => x !== id);
+  } else {
+    summited.push(id);
+  }
+  localStorage.setItem('co14ers_summited', JSON.stringify(summited));
+  updateProgress();
+  renderPeakList();
+  renderPeaks();
+  renderListBody();
+  refreshMapMarkers();
+  if (selectedId === id) renderDetail(id);
+}
+
+function updateProgress() {
+  const n = summited.length;
+  const pct = Math.round(n / PEAKS.length * 100);
+  document.getElementById('progressLabel').textContent = `${n} / ${PEAKS.length} Summited`;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+}
+
+function peakVisible(p) {
+  if (!activeClasses.has(p.cls)) return false;
+  if (activeRange !== 'all' && p.range !== activeRange) return false;
+  if (unsummitedOnly && isSummited(p.id)) return false;
+  if (hideSubpeaks && p.sub) return false;
+  return true;
+}
+
+// ============================================================
+// MAP RENDERING
+// ============================================================
+function renderPeaks() {
+  const layer = document.getElementById('peaksLayer');
+  layer.innerHTML = '';
+
+  PEAKS.forEach(p => {
+    const x = lngToX(p.lng);
+    const y = latToY(p.lat);
+    const vis = peakVisible(p);
+    const summ = isSummited(p.id);
+    const sel = selectedId === p.id;
+
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('transform', `translate(${x},${y})`);
+    g.setAttribute('class', 'peak-dot');
+    g.style.cursor = 'pointer';
+    g.style.opacity = vis ? '1' : '0.08';
+
+    // Glow ring for selected
+    if (sel && vis) {
+      const glow = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      glow.setAttribute('r', '10');
+      glow.setAttribute('fill', 'none');
+      glow.setAttribute('stroke', summ ? '#a78bfa' : classColor(p.cls));
+      glow.setAttribute('stroke-width', '2');
+      glow.setAttribute('opacity', '0.6');
+      glow.setAttribute('filter', 'url(#glow)');
+      g.appendChild(glow);
+    }
+
+    // Main dot
+    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    const r = p.elev >= 14200 ? 6 : p.elev >= 14100 ? 5 : 4;
+    dot.setAttribute('r', String(r));
+    dot.setAttribute('fill', summ ? '#a78bfa' : classColor(p.cls));
+    dot.setAttribute('stroke', sel ? '#fff' : (summ ? '#c4b5fd' : 'rgba(0,0,0,0.4)'));
+    dot.setAttribute('stroke-width', sel ? '1.5' : '0.5');
+    if (p.sub) dot.setAttribute('fill-opacity', '0.6');
+    g.appendChild(dot);
+
+    // Summit checkmark
+    if (summ && vis) {
+      const check = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      check.setAttribute('x', '0');
+      check.setAttribute('y', '-' + (r + 3));
+      check.setAttribute('text-anchor', 'middle');
+      check.setAttribute('font-size', '7');
+      check.setAttribute('fill', '#a78bfa');
+      check.textContent = '✓';
+      g.appendChild(check);
+    }
+
+    // Events
+    g.addEventListener('mouseenter', (e) => showTooltip(e, p));
+    g.addEventListener('mouseleave', hideTooltip);
+    g.addEventListener('click', () => selectPeak(p.id));
+
+    layer.appendChild(g);
+  });
+}
+
+// ============================================================
+// TOOLTIP
+// ============================================================
+const tooltip = document.getElementById('tooltip');
+
+function showTooltip(e, p) {
+  const summ = isSummited(p.id);
+  tooltip.innerHTML = `
+    <div class="tt-name">${p.name} ${summ ? '✓' : ''}</div>
+    <div class="tt-info">
+      ${p.elev.toLocaleString()} ft &nbsp;·&nbsp; ${classLabel(p.cls)} &nbsp;·&nbsp; ${p.range}
+      ${p.sub ? '<br><span style="opacity:.6">Sub-peak</span>' : ''}
+    </div>`;
+  tooltip.classList.add('visible');
+  moveTooltip(e);
+}
+
+function moveTooltip(e) {
+  const x = e.clientX + 14;
+  const y = e.clientY - 10;
+  tooltip.style.left = Math.min(x, window.innerWidth - 180) + 'px';
+  tooltip.style.top = y + 'px';
+}
+
+function hideTooltip() {
+  tooltip.classList.remove('visible');
+}
+
+document.addEventListener('mousemove', e => {
+  if (tooltip.classList.contains('visible')) moveTooltip(e);
+});
+
+// ============================================================
+// PEAK LIST (sidebar)
+// ============================================================
+function renderPeakList() {
+  const container = document.getElementById('peakList');
+  const sorted = [...PEAKS].sort((a,b) => b.elev - a.elev);
+
+  container.innerHTML = sorted.map(p => {
+    const vis = peakVisible(p);
+    const summ = isSummited(p.id);
+    const sel = selectedId === p.id;
+    const color = classColor(p.cls);
+
+    return `<div class="peak-list-item ${vis ? '' : 'hidden'} ${sel ? 'selected' : ''} ${summ ? 'summited' : ''}"
+      data-id="${p.id}"
+      onclick="selectPeak(${p.id})">
+      <input type="checkbox" class="peak-cb" ${summ ? 'checked' : ''}
+        onclick="event.stopPropagation(); toggleSummit(${p.id})"
+        title="Mark as summited">
+      <div class="class-badge" style="background:${color}22; color:${color}; border:1px solid ${color}55">${p.cls}</div>
+      <div class="peak-list-name" title="${p.name}">${p.name}</div>
+      <div class="peak-list-elev">${p.elev.toLocaleString()}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// DETAIL PANEL
+// ============================================================
+function selectPeak(id) {
+  selectedId = id;
+
+  // Auto-expand detail panel if collapsed
+  const panel = document.querySelector('.detail-panel');
+  const btn = document.getElementById('btnCollapseDetail');
+  if (panel && panel.classList.contains('collapsed')) {
+    panel.classList.remove('collapsed');
+    if (btn) btn.textContent = '›';
+  }
+
+  renderPeaks();
+  renderPeakList();
+  renderListBody();
+  renderDetail(id);
+  refreshMapMarkers();
+
+  const el = document.querySelector(`.peak-list-item[data-id="${id}"]`);
+  if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+function renderDetail(id) {
+  const p = PEAKS.find(x => x.id === id);
+  if (!p) return;
+
+  document.getElementById('detailEmpty').style.display = 'none';
+  const dc = document.getElementById('detailContent');
+  dc.style.display = 'block';
+
+  const summ = isSummited(p.id);
+  const color = classColor(p.cls);
+  const atUrl = `https://www.alltrails.com/trail/us/colorado/${p.slug}?utm_source=claude&utm_campaign=claude_widgets_launch_2026&utm_medium=mcp_widget`;
+  const prep = CLASS_PREP[p.cls];
+
+  dc.innerHTML = `
+    <div class="detail-hero">
+      <div class="detail-class-badge" style="background:${color}22; color:${color}; border:1px solid ${color}44">
+        ${classLabel(p.cls)}
+      </div>
+      <div class="detail-range">${p.range}</div>
+      <div class="detail-name">${p.name}</div>
+      <div class="detail-elev"><span>${p.elev.toLocaleString()} ft</span> · ${(p.elev * 0.3048 / 1000).toFixed(2)} km</div>
+      ${p.sub ? `<div class="sub-peak-badge">⬡ Sub-peak (of 58)</div>` : ''}
+      <button class="summit-btn ${summ ? 'summited' : 'unsummited'}" onclick="toggleSummit(${p.id})">
+        ${summ
+          ? `<span>✓</span> Summited — click to remove`
+          : `<span>○</span> Mark as Summited`}
+      </button>
+    </div>
+
+    <div class="detail-stats">
+      <div class="stat-cell">
+        <div class="stat-label">Elevation <span class="src-badge src-usgs">USGS</span></div>
+        <div class="stat-value">${p.elev.toLocaleString()}</div>
+        <div class="stat-sub">feet above sea level</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label">Trail Length <span class="src-badge src-at">AllTrails</span></div>
+        <div class="stat-value">${p.miles}</div>
+        <div class="stat-sub">miles round trip</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label">Elev. Gain <span class="src-badge src-at">AllTrails</span></div>
+        <div class="stat-value">${p.gain.toLocaleString()}</div>
+        <div class="stat-sub">feet</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label">AT Rating <span class="src-badge src-at">AllTrails</span></div>
+        <div class="stat-value">${p.rating}</div>
+        <div class="stat-sub stars">${stars(p.rating)}</div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h4>Best Season <span class="src-badge src-14ers">14ers.com</span></h4>
+      <div class="season-badge">📅 ${p.season}</div>
+      <p style="margin-top:6px; font-size:11px;">Most Colorado 14ers are safest July–September when snowpack has melted and before early-fall storms. Conditions vary year to year — always check forecasts at <strong style="color:var(--text)">mountain-forecast.com</strong>.</p>
+    </div>
+
+    ${p.note ? `
+    <div class="detail-section">
+      <h4>Peak Notes <span class="src-badge src-14ers">14ers.com</span></h4>
+      <p>${p.note}</p>
+    </div>` : ''}
+
+    <div class="detail-section">
+      <h4>Class ${p.cls} Prep <span class="src-badge src-14ers">14ers.com</span></h4>
+      <p>${prep}</p>
+    </div>
+
+    <!-- Open immersive peak page -->
+    <button onclick="openPeakPage(${p.id})" style="
+      display:flex; align-items:center; gap:8px; width:calc(100% - 32px);
+      margin: 0 16px 10px; padding:11px 14px; border-radius:8px;
+      background:linear-gradient(135deg,#1a2640,#0f1e30); border:1px solid #2a4060;
+      color:#79b8ff; font-size:12px; font-weight:700; cursor:pointer;
+      font-family:inherit; transition:all .15s; letter-spacing:0.2px;"
+      onmouseover="this.style.borderColor='#79b8ff'"
+      onmouseout="this.style.borderColor='#2a4060'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      Open Full Peak Profile
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:auto">
+        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+      </svg>
+    </button>
+
+    <a href="${atUrl}" target="_blank" class="alltrails-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12 C3 7 7 3 12 3 C17 3 21 7 21 12 C21 17 17 21 12 21 C7 21 3 17 3 12Z"/>
+        <path d="M8 12 L10 8 L12 12 L14 10 L16 14"/>
+      </svg>
+      View Trail on AllTrails
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto">
+        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+        <polyline points="15 3 21 3 21 9"/>
+        <line x1="10" y1="14" x2="21" y2="3"/>
+      </svg>
+    </a>
+
+    <div class="sources-footer">
+      <div class="sources-footer-title">Data Sources</div>
+      <div class="sources-footer-row">
+        <span class="src-badge src-at">AllTrails</span>
+        Trail length · elevation gain · star rating · trail link
+      </div>
+      <div class="sources-footer-row">
+        <span class="src-badge src-usgs">USGS</span>
+        Summit elevation · geographic coordinates
+      </div>
+      <div class="sources-footer-row">
+        <span class="src-badge src-14ers">14ers.com</span>
+        Class rating · range · season · sub-peak designation
+      </div>
+      <div class="alltrails-cta">
+        🥾 <strong>Love hiking?</strong> Get detailed trail maps, photos, and reviews on <a href="https://www.alltrails.com" target="_blank" rel="noopener">AllTrails</a> — the #1 hiking app with offline maps and more.
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// FILTERS
+// ============================================================
+function toggleClassFilter(cls, btn) {
+  if (activeClasses.has(cls)) {
+    if (activeClasses.size === 1) return; // keep at least one
+    activeClasses.delete(cls);
+    btn.classList.remove('active');
+  } else {
+    activeClasses.add(cls);
+    btn.classList.add('active');
+  }
+  applyFilters();
+}
+
+function setRangeFilter(range, btn) {
+  activeRange = range;
+  document.querySelectorAll('.range-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function toggleUnsummitedOnly() {
+  unsummitedOnly = !unsummitedOnly;
+  document.getElementById('btnUnsummited').classList.toggle('active', unsummitedOnly);
+  applyFilters();
+}
+
+function toggleSubpeaks() {
+  hideSubpeaks = !hideSubpeaks;
+  document.getElementById('btnSubpeaks').classList.toggle('active', hideSubpeaks);
+  applyFilters();
+}
+
+function applyFilters() {
+  renderPeakList();
+  renderPeaks();
+  renderListBody();
+  refreshMapMarkers();
+  if (currentTab === 'panorama') renderPanorama();
+}
+
+// ============================================================
+// LIST VIEW
+// ============================================================
+function renderListBody() {
+  const body = document.getElementById('listBody');
+  const sorted = [...PEAKS].sort((a,b) => {
+    let va = a[sortKey], vb = b[sortKey];
+    if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); }
+    return sortDir * (va > vb ? 1 : va < vb ? -1 : 0);
+  });
+
+  body.innerHTML = sorted.map(p => {
+    const vis = peakVisible(p);
+    const summ = isSummited(p.id);
+    const sel = selectedId === p.id;
+    const color = classColor(p.cls);
+
+    return `<tr class="${vis ? '' : 'hidden'} ${summ ? 'summited' : ''} ${sel ? 'selected' : ''}"
+      onclick="selectPeak(${p.id})">
+      <td>
+        <input type="checkbox" class="peak-cb" ${summ ? 'checked' : ''}
+          onclick="event.stopPropagation(); toggleSummit(${p.id})" style="width:13px;height:13px">
+      </td>
+      <td>
+        ${p.name}
+        ${p.sub ? '<span style="font-size:9px;color:var(--muted);margin-left:4px">sub</span>' : ''}
+      </td>
+      <td style="font-weight:600">${p.elev.toLocaleString()} ft</td>
+      <td><span class="class-badge" style="background:${color}22;color:${color};border:1px solid ${color}44">${p.cls}</span></td>
+      <td><span class="range-tag">${p.range}</span></td>
+      <td style="color:var(--muted)">${p.season}</td>
+      <td style="color:var(--muted)">${p.miles}</td>
+      <td style="color:var(--muted)">${p.gain.toLocaleString()}</td>
+      <td><span class="stars" style="font-size:10px">${'★'.repeat(Math.round(p.rating))}</span> ${p.rating}</td>
+    </tr>`;
+  }).join('');
+}
+
+function sortBy(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = key === 'name' ? 1 : -1; }
+  renderListBody();
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tab);
+  });
+  document.getElementById('tabPanorama').style.display = tab === 'panorama' ? '' : 'none';
+  document.getElementById('tabMap').style.display = tab === 'map' ? '' : 'none';
+  document.getElementById('tabList').style.display = tab === 'list' ? '' : 'none';
+
+  // Reset to "All Ranges" when switching tabs
+  if (activeRange !== 'all') {
+    activeRange = 'all';
+    document.querySelectorAll('.range-filter .range-chip').forEach(chip => {
+      chip.classList.toggle('active', chip.dataset.range === 'all');
+    });
+    // Clear selected peak when resetting range
+    selectedId = null;
+    document.getElementById('detailContent').style.display = 'none';
+    applyFilters();
+  }
+
+  if (tab === 'panorama') renderPanorama();
+  if (tab === 'map') {
+    initGoogleMap();
+    // If map already exists, resize in case dimensions changed while hidden
+    if (gMap) setTimeout(() => google.maps.event.trigger(gMap, 'resize'), 50);
+  }
+}
+
+// ============================================================
+// PEAK DETAIL PAGE (opens in new tab)
+// ============================================================
+function openPeakPage(id) {
+  const p = PEAKS.find(x => x.id === id);
+  if (!p) return;
+  const summited = isSummited(id);
+  const color = classColor(p.cls);
+  const atUrl = `https://www.alltrails.com/trail/us/colorado/${p.slug}?utm_source=claude&utm_campaign=claude_widgets_launch_2026&utm_medium=mcp_widget`;
+
+  // Range-specific color palettes
+  const pal = {
+    'Sawatch':          { s1:'#030812', s2:'#0a1628', h1:'#0f2040', h2:'#07121e' },
+    'Front Range':      { s1:'#040810', s2:'#0c1825', h1:'#0c1e38', h2:'#06101a' },
+    'Mosquito':         { s1:'#030a08', s2:'#081820', h1:'#0a2018', h2:'#050e08' },
+    'Elk Mountains':    { s1:'#060508', s2:'#14101e', h1:'#1c1408', h2:'#0e0a06' },
+    'Sangre de Cristo': { s1:'#0a0506', s2:'#180c10', h1:'#220c10', h2:'#120608' },
+    'San Juan':         { s1:'#03030c', s2:'#08081e', h1:'#0c1028', h2:'#06080e' },
+  }[p.range] || { s1:'#030812', s2:'#0a1628', h1:'#0f2040', h2:'#07121e' };
+
+  // Seeded RNG for deterministic stars per peak
+  function lcg(seed) {
+    let s = seed * 7919;
+    return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 0xffffffff; };
+  }
+  const rng = lcg(p.id);
+  const starsSVG = Array.from({length: 80}, () => {
+    const x = (rng() * 1200).toFixed(1), y = (rng() * 270).toFixed(1);
+    const r = (rng() * 1.3 + 0.2).toFixed(1), o = (rng() * 0.5 + 0.12).toFixed(2);
+    return `<circle cx="${x}" cy="${y}" r="${r}" fill="white" opacity="${o}"/>`;
+  }).join('');
+
+  // Mountain silhouette paths — 4 sets, one per class
+  // Each has far/mid/main/snow layers. ViewBox 1200×480
+  const M = {
+    1: { // Smooth walk-up dome
+      far:  `M0,410 C250,395 450,375 620,362 C790,349 980,355 1200,380 L1200,480 L0,480Z`,
+      mid:  `M0,462 C100,452 220,438 340,422 C480,404 610,392 740,385 C870,378 1020,382 1200,402 L1200,480 L0,480Z`,
+      main: `M50,480 C170,478 275,464 360,448 C425,436 468,418 498,394 C518,374 528,350 536,322 C541,302 544,280 547,256 C548,240 549,226 551,210 C553,226 555,242 557,260 C561,285 567,312 576,342 C588,374 608,408 660,442 C718,464 840,476 1200,480Z`,
+      snow: `M510,386 C520,362 528,336 534,308 C539,288 542,268 545,244 C547,228 549,215 550,204 L554,216 C556,230 559,248 562,268 C566,292 572,320 582,348 C590,368 604,390 618,406 C594,414 570,417 548,415 C530,413 517,404 510,386Z`,
+      tc:   { start:[360,476], summit:[551,210] },
+    },
+    2: { // Pointed peak, moderate scramble
+      far:  `M0,422 C220,408 420,390 580,378 C740,366 940,368 1200,390 L1200,480 L0,480Z`,
+      mid:  `M0,466 C80,458 185,444 295,428 C420,410 548,396 670,388 C795,380 940,382 1200,400 L1200,480 L0,480Z`,
+      main: `M40,480 C145,476 235,462 318,446 C385,434 432,416 465,392 C488,374 503,348 514,318 C522,296 527,270 530,242 C532,224 533,207 535,190 C537,207 539,226 541,245 C545,274 551,305 562,338 C576,372 600,410 655,446 C724,468 860,478 1200,480Z`,
+      snow: `M492,380 C504,354 515,322 523,290 C527,268 530,246 532,222 C533,208 534,196 535,190 C537,205 538,222 540,242 C543,268 549,298 559,330 C567,352 580,376 594,396 C570,406 547,408 524,406 C507,404 495,396 492,380Z`,
+      tc:   { start:[328,474], summit:[535,190] },
+    },
+    3: { // Technical scramble, jagged ridgeline
+      far:  `M0,432 C180,418 340,404 500,392 C640,382 775,376 910,378 C1020,380 1110,386 1200,400 L1200,480 L0,480Z`,
+      mid:  `M0,468 C65,462 145,450 228,436 C325,418 430,404 535,394 C640,384 760,378 880,378 C1000,378 1110,382 1200,396 L1200,480 L0,480Z`,
+      main: `M25,480 C115,477 195,466 265,452 C328,440 370,422 400,400 C422,384 436,362 446,336 C453,316 457,294 460,270 C462,252 463,234 464,215 C465,198 466,183 468,168 C470,153 472,140 474,130 L478,142 C480,158 482,175 485,196 C488,218 492,242 497,267 C503,295 511,322 522,348 C536,378 556,404 584,424 C608,440 642,456 700,467 C764,476 880,480 1200,480Z`,
+      snow: `M441,328 C447,304 452,278 457,252 C460,234 462,216 463,199 C464,184 465,170 467,156 C469,144 471,134 473,128 C475,138 477,152 480,168 C483,186 486,206 490,228 C494,252 499,278 507,304 C514,322 526,344 540,364 C518,374 496,378 476,376 C460,374 448,358 441,328Z`,
+      tc:   { start:[275,478], summit:[474,130] },
+    },
+    4: { // Very technical, multiple summits visible
+      far:  `M0,438 C165,424 320,410 475,400 C605,392 730,386 860,382 C975,378 1090,382 1200,396 L1200,480 L0,480Z`,
+      mid:  `M0,470 C55,464 120,454 200,440 C290,424 395,410 505,400 C615,390 735,382 860,378 C985,374 1100,378 1200,392 L1200,480 L0,480Z`,
+      main: `M15,480 C90,478 162,468 228,454 C285,442 328,424 356,404 C376,390 389,368 397,344 C403,324 406,302 408,278 C409,260 410,242 410,224 C411,206 411,190 412,174 C413,158 414,144 416,132 L420,145 C422,160 424,176 427,194 C430,214 434,236 438,258 C442,282 447,308 454,332 C462,358 474,382 490,400 C506,416 522,428 540,438 C556,446 574,452 592,456 L600,460 C578,468 544,474 498,478 C440,481 320,480 180,480Z`,
+      snow: `M393,336 C399,310 404,282 407,254 C409,234 410,214 410,196 C411,178 411,163 412,148 C413,134 414,122 415,113 C417,123 419,136 421,151 C423,168 426,186 429,206 C433,228 437,252 442,278 C447,305 454,332 464,356 C472,374 483,390 495,404 C474,410 454,414 434,412 C419,410 408,386 393,336Z`,
+      tc:   { start:[238,476], summit:[412,132] },
+    },
+  };
+
+  const paths = M[p.cls] || M[2];
+  const tc = paths.tc;
+
+  // Elevation profile SVG
+  function buildElevProfile() {
+    const W = 860, H = 164, pad = {l:64, r:28, t:18, b:36};
+    const cW = W - pad.l - pad.r, cH = H - pad.t - pad.b;
+    const startElev = p.elev - p.gain;
+    const minE = startElev - 200, maxE = p.elev + 300;
+    const toX = d => pad.l + (d / p.miles) * cW;
+    const toY = e => pad.t + cH - ((e - minE) / (maxE - minE)) * cH;
+
+    // Profile curve based on class
+    const N = 80;
+    const pts = Array.from({length: N+1}, (_, i) => {
+      const t = i / N;
+      const f = p.cls === 1 ? t
+               : p.cls === 2 ? Math.pow(t, 1.5)
+               : p.cls === 3 ? Math.pow(t, 2.0)
+               : Math.pow(t, 2.4) + Math.sin(t * Math.PI * 2.5) * 0.03;
+      return { d: t * p.miles, e: startElev + (p.elev - startElev) * Math.min(1, Math.max(0, f)) };
+    });
+
+    const line = pts.map((pt, i) => `${i ? 'L' : 'M'}${toX(pt.d).toFixed(1)},${toY(pt.e).toFixed(1)}`).join(' ');
+    const area = line + ` L${toX(p.miles).toFixed(1)},${(pad.t+cH).toFixed(1)} L${pad.l},${(pad.t+cH).toFixed(1)} Z`;
+
+    // Grid at round 1000ft intervals
+    const gridStart = Math.ceil(startElev / 1000) * 1000;
+    const grids = [];
+    for (let e = gridStart; e <= p.elev; e += 1000) {
+      const y = toY(e).toFixed(1);
+      grids.push(`<line x1="${pad.l}" y1="${y}" x2="${W-pad.r}" y2="${y}" stroke="rgba(48,54,61,.45)" stroke-width="0.8" stroke-dasharray="4,5"/>
+        <text x="${pad.l-6}" y="${(+y+3.5).toFixed(1)}" text-anchor="end" font-size="8.5" fill="#8b949e" font-family="sans-serif">${e.toLocaleString()}</text>`);
+    }
+
+    const sx = toX(0).toFixed(1), sy = toY(startElev).toFixed(1);
+    const ex = toX(p.miles).toFixed(1), ey = toY(p.elev).toFixed(1);
+
+    return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+      ${grids.join('')}
+      <path d="${area}" fill="${color}14"/>
+      <path d="${line}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linejoin="round"/>
+      <circle cx="${sx}" cy="${sy}" r="4" fill="rgba(139,148,158,.7)"/>
+      <circle cx="${ex}" cy="${ey}" r="5" fill="${color}"/>
+      <text x="${(+ex-6).toFixed(1)}" y="${(+ey-10).toFixed(1)}" text-anchor="end" font-size="9" fill="${color}" font-family="sans-serif" font-weight="700">Summit ${p.elev.toLocaleString()} ft</text>
+      <text x="${sx}" y="${(+sy+14).toFixed(1)}" text-anchor="middle" font-size="9" fill="#8b949e" font-family="sans-serif">TH ${startElev.toLocaleString()} ft</text>
+      <text x="${(pad.l + cW/2).toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="8.5" fill="#8b949e" font-family="sans-serif">${p.miles} miles</text>
+      <line x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${pad.t+cH}" stroke="rgba(48,54,61,.7)" stroke-width="1"/>
+      <line x1="${pad.l}" y1="${pad.t+cH}" x2="${W-pad.r}" y2="${pad.t+cH}" stroke="rgba(48,54,61,.7)" stroke-width="1"/>
+    </svg>`;
+  }
+
+  const classDescs = {1:'Walk-Up Trail', 2:'Off-Trail Scramble', 3:'Technical Scramble', 4:'Technical Climb'};
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${p.name} — Colorado 14ers</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#060a10;--panel:rgba(13,17,23,.95);--border:rgba(30,42,58,.8);--text:#e6edf3;--muted:#8b949e;--color:${color}}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* BACK BAR */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:14px 28px;background:linear-gradient(to bottom,rgba(6,10,16,.96) 0%,transparent 100%)}
+.back-btn{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:8px;background:rgba(13,17,23,.8);border:1px solid rgba(48,64,80,.7);color:#8b949e;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:color .15s,border-color .15s;backdrop-filter:blur(10px)}
+.back-btn:hover{color:var(--text);border-color:#4a6a8a}
+.summit-chip{display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;backdrop-filter:blur(10px);background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.35);color:#a78bfa}
+
+/* HERO */
+.hero{position:relative;width:100%;height:62vh;min-height:420px;overflow:hidden}
+.hero svg{width:100%;height:100%;display:block}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(6,10,16,1) 0%,rgba(6,10,16,.35) 45%,transparent 78%);display:flex;flex-direction:column;justify-content:flex-end;padding:52px 56px}
+.hero-range{font-size:10px;letter-spacing:2.2px;text-transform:uppercase;color:rgba(139,148,158,.65);margin-bottom:10px}
+.hero-name{font-size:clamp(38px,5.5vw,64px);font-weight:800;letter-spacing:-1.5px;line-height:1;margin-bottom:14px;text-shadow:0 4px 32px rgba(0,0,0,.9)}
+.hero-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.hero-elev{font-size:20px;color:rgba(230,237,243,.55);font-weight:400}
+.hero-elev strong{color:var(--text);font-size:26px;font-weight:700}
+.class-pill{padding:5px 14px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid;letter-spacing:.5px}
+
+/* STATS STRIP */
+.stats{display:flex;background:rgba(10,14,22,.97);border-bottom:1px solid var(--border)}
+.stat{flex:1;padding:22px 24px;border-right:1px solid var(--border)}
+.stat:last-child{border-right:none}
+.stat-lbl{font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.stat-val{font-size:23px;font-weight:700;margin-bottom:3px}
+.stat-sub{font-size:10px;color:var(--muted)}
+.src{display:inline-flex;align-items:center;padding:1px 5px;border-radius:3px;font-size:7.5px;font-weight:700;letter-spacing:.3px;vertical-align:middle;line-height:1.6}
+.sat {background:rgba(34,197,94,.1);color:#4ade80;border:1px solid rgba(34,197,94,.22)}
+.sus {background:rgba(56,139,253,.1);color:#79b8ff;border:1px solid rgba(56,139,253,.22)}
+.s14 {background:rgba(251,191,36,.08);color:#fbbf24;border:1px solid rgba(251,191,36,.2)}
+
+/* CONTENT */
+.content{max-width:900px;margin:0 auto;padding:60px 28px 100px}
+.section-label{font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.card{background:rgba(13,17,24,.7);border:1px solid var(--border);border-radius:14px;padding:26px;margin-bottom:24px}
+.card h3{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.card p{font-size:13px;color:rgba(230,237,243,.68);line-height:1.75}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.elev-wrap{background:rgba(13,17,24,.7);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:48px}
+.elev-wrap svg{width:100%;display:block;padding:16px 8px 4px}
+
+/* CTA */
+.cta{display:flex;gap:12px;margin-top:48px}
+.btn-at{flex:1;display:flex;align-items:center;justify-content:center;gap:10px;padding:17px 24px;border-radius:10px;background:linear-gradient(135deg,#1b3228,#102018);border:1px solid rgba(74,222,128,.28);color:#4ade80;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s;font-family:inherit}
+.btn-at:hover{border-color:#4ade80;background:linear-gradient(135deg,#243e32,#162820)}
+.btn-x{padding:17px 20px;border-radius:10px;background:rgba(13,17,24,.7);border:1px solid var(--border);color:var(--muted);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-x:hover{color:var(--text);border-color:#4a6a8a}
+
+/* SOURCES */
+.sources-row{margin-top:52px;padding-top:24px;border-top:1px solid var(--border);display:flex;gap:18px;flex-wrap:wrap;font-size:10px;color:var(--muted)}
+.src-item{display:flex;align-items:center;gap:6px}
+
+@media(max-width:640px){.stats{flex-wrap:wrap}.stat{min-width:50%}.grid2{grid-template-columns:1fr}.hero-overlay{padding:28px 24px}}
+  /* DISCLAIMER BAR */
+  .disclaimer-bar {
+    background: rgba(74,222,128,0.04);
+    border-bottom: 1px solid rgba(74,222,128,0.12);
+    padding: 7px 20px;
+    font-size: 10.5px;
+    color: var(--muted);
+    line-height: 1.5;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .disclaimer-bar a {
+    color: rgba(74,222,128,0.7);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(74,222,128,0.25);
+  }
+
+  .disclaimer-bar a:hover {
+    color: #4ade80;
+    border-bottom-color: #4ade80;
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <button class="back-btn" onclick="window.close()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to Tracker
+  </button>
+  ${summited ? '<div class="summit-chip">✓ Summit Logged</div>' : ''}
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <svg viewBox="0 0 1200 480" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${pal.s1}"/>
+        <stop offset="65%" stop-color="${pal.s2}"/>
+        <stop offset="100%" stop-color="${pal.h2}"/>
+      </linearGradient>
+      <linearGradient id="snowG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="rgba(225,238,255,0.94)"/>
+        <stop offset="100%" stop-color="rgba(205,225,248,0.42)"/>
+      </linearGradient>
+      <linearGradient id="fog" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${pal.h2}" stop-opacity="0"/>
+        <stop offset="100%" stop-color="${pal.h2}" stop-opacity="0.75"/>
+      </linearGradient>
+      <filter id="glo"><feGaussianBlur stdDeviation="9"/></filter>
+      <filter id="glo2"><feGaussianBlur stdDeviation="3"/></filter>
+    </defs>
+
+    <rect width="1200" height="480" fill="url(#sky)"/>
+    ${starsSVG}
+    <path d="${paths.far}" fill="${pal.h2}" opacity="0.82"/>
+    <path d="${paths.mid}" fill="${pal.h1}" opacity="0.88"/>
+    <path d="${paths.main}" fill="${pal.h2}"/>
+    <path d="${paths.snow}" fill="url(#snowG)" opacity="0.85"/>
+
+    <!-- Trail glow (outer) -->
+    <line x1="${tc.start[0]}" y1="${tc.start[1]}" x2="${tc.summit[0]}" y2="${tc.summit[1]}"
+      stroke="rgba(255,175,40,0.28)" stroke-width="16" stroke-linecap="round" filter="url(#glo)"/>
+    <!-- Trail line -->
+    <line x1="${tc.start[0]}" y1="${tc.start[1]}" x2="${tc.summit[0]}" y2="${tc.summit[1]}"
+      stroke="rgba(255,205,70,0.88)" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="7,5"/>
+
+    <!-- Trailhead marker -->
+    <circle cx="${tc.start[0]}" cy="${tc.start[1]}" r="7" fill="none" stroke="rgba(255,175,40,.5)" stroke-width="1.5"/>
+    <circle cx="${tc.start[0]}" cy="${tc.start[1]}" r="3" fill="rgba(255,175,40,.8)"/>
+
+    <!-- Summit glow & marker -->
+    <circle cx="${tc.summit[0]}" cy="${tc.summit[1]}" r="14" fill="rgba(255,220,90,.18)" filter="url(#glo2)"/>
+    <circle cx="${tc.summit[0]}" cy="${tc.summit[1]}" r="5" fill="rgba(255,225,100,.92)"/>
+    <circle cx="${tc.summit[0]}" cy="${tc.summit[1]}" r="10" fill="none" stroke="rgba(255,220,90,.55)" stroke-width="1.5"/>
+
+    <!-- Summit label -->
+    <text x="${tc.summit[0]+16}" y="${tc.summit[1]+4}" font-family="-apple-system,sans-serif" font-size="11.5" fill="rgba(255,225,100,.92)" font-weight="700">${p.elev.toLocaleString()} ft</text>
+
+    <!-- Atmospheric base fog -->
+    <rect y="360" width="1200" height="120" fill="url(#fog)"/>
+  </svg>
+
+  <div class="hero-overlay">
+    <div class="hero-range">${p.range} Range &nbsp;·&nbsp; Colorado</div>
+    <div class="hero-name">${p.name}</div>
+    <div class="hero-meta">
+      <div class="hero-elev"><strong>${p.elev.toLocaleString()} ft</strong> &nbsp;<span>${(p.elev * 0.3048).toFixed(0)} m</span></div>
+      <span class="class-pill" style="color:${color};border-color:${color}50;background:${color}16">${classDescs[p.cls]}</span>
+      ${p.sub ? '<span style="font-size:11px;color:rgba(139,148,158,.55)">Sub-peak</span>' : ''}
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <div class="stat-lbl">Elevation <span class="src sus">USGS</span></div>
+    <div class="stat-val">${p.elev.toLocaleString()}</div>
+    <div class="stat-sub">feet above sea level</div>
+  </div>
+  <div class="stat">
+    <div class="stat-lbl">Trail Distance <span class="src sat">AllTrails</span></div>
+    <div class="stat-val">${p.miles}</div>
+    <div class="stat-sub">miles round trip</div>
+  </div>
+  <div class="stat">
+    <div class="stat-lbl">Elevation Gain <span class="src sat">AllTrails</span></div>
+    <div class="stat-val">${p.gain.toLocaleString()}</div>
+    <div class="stat-sub">feet · ${(p.gain * 0.3048).toFixed(0)} m</div>
+  </div>
+  <div class="stat">
+    <div class="stat-lbl">Best Season <span class="src s14">14ers.com</span></div>
+    <div class="stat-val" style="font-size:17px;padding-top:3px">${p.season}</div>
+    <div class="stat-sub">recommended window</div>
+  </div>
+  <div class="stat">
+    <div class="stat-lbl">AllTrails Rating <span class="src sat">AllTrails</span></div>
+    <div class="stat-val">${p.rating}</div>
+    <div class="stat-sub" style="color:#eab308">${'★'.repeat(Math.round(p.rating))}${'☆'.repeat(5-Math.round(p.rating))}</div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <div style="margin-bottom:48px">
+    <div class="section-label">Elevation Profile</div>
+    <div class="elev-wrap">${buildElevProfile()}</div>
+  </div>
+
+  ${p.note ? `
+  <div class="card" style="margin-bottom:32px">
+    <h3>About this Peak <span class="src s14">14ers.com</span></h3>
+    <p>${p.note}</p>
+  </div>` : ''}
+
+  <div class="section-label" style="margin-bottom:20px">Preparation</div>
+  <div class="grid2">
+    <div class="card">
+      <h3>Class ${p.cls} — ${classDescs[p.cls]} <span class="src s14">14ers.com</span></h3>
+      <p>${CLASS_PREP[p.cls]}</p>
+    </div>
+    <div class="card">
+      <h3>Weather & Timing</h3>
+      <p>Colorado thunderstorms build most afternoons in summer. Summit before noon — that means starting at 3–6am depending on trail length. Best conditions: <strong style="color:var(--text)">${p.season}</strong>. Always check <strong style="color:var(--text)">mountain-forecast.com</strong> the evening before.</p>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <a href="${atUrl}" target="_blank" class="btn-at">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12C3 7 7 3 12 3s9 4 9 9-4 9-9 9-9-4-9-9z"/><path d="M8 12l2-4 2 4 2-2 2 4"/></svg>
+      View Full Trail on AllTrails
+    </a>
+    <button class="btn-x" onclick="window.close()">Close</button>
+  </div>
+
+  <!-- Sources -->
+  <div class="sources-row">
+    <div class="src-item"><span class="src sat">AllTrails</span> Trail distance · elevation gain · rating</div>
+    <div class="src-item"><span class="src sus">USGS</span> Summit elevation · coordinates</div>
+    <div class="src-item"><span class="src s14">14ers.com</span> Class · season · range · prep</div>
+  </div>
+</div>
+
+</body></html>`;
+
+  const blob = new Blob([html], {type:'text/html'});
+  window.open(URL.createObjectURL(blob), '_blank');
+}
+
+// ============================================================
+// PANORAMA RENDERING - ISOMETRIC TERRAIN VIEW
+// ============================================================
+function renderPanorama() {
+  const container = document.getElementById('panoramaContainer');
+  container.innerHTML = '';
+  
+  // Create main terrain section
+  const terrainSection = document.createElement('div');
+  terrainSection.className = 'pano-range';
+  
+  const title = document.createElement('div');
+  title.className = 'pano-range-title';
+  title.textContent = 'Colorado 14ers — Terrain View';
+  terrainSection.appendChild(title);
+  
+  // Build isometric terrain canvas
+  const canvas = document.createElement('canvas');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = 1600 * dpr;
+  canvas.height = 800 * dpr;
+  canvas.style.width = '100%';
+  canvas.style.height = 'auto';
+  canvas.style.display = 'block';
+  
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  
+  // Sky background
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, 800);
+  skyGrad.addColorStop(0, '#d4c5b8');
+  skyGrad.addColorStop(1, '#ebe5de');
+  ctx.fillStyle = skyGrad;
+  ctx.fillRect(0, 0, 1600, 800);
+  
+  // Get all peaks sorted west to east
+  const allPeaks = PEAKS.filter(p => !p.sub).sort((a, b) => a.lng - b.lng);
+  
+  // Create 3 depth layers for parallax effect
+  const numLayers = 3;
+  
+  for (let layer = numLayers - 1; layer >= 0; layer--) {
+    const layerDepth = layer / numLayers;
+    
+    // Each layer gets a subset of peaks based on latitude
+    const layerPeaks = allPeaks.filter((p, i) => {
+      const latNorm = (p.lat - 37) / (40.5 - 37); // Normalize latitude 0-1
+      const bucket = Math.floor(latNorm * numLayers);
+      return bucket === layer;
+    });
+    
+    if (layerPeaks.length === 0) continue;
+    
+    layerPeaks.sort((a, b) => a.lng - b.lng);
+    
+    // Build continuous ridge line
+    const baseY = 680 - layer * 50;
+    const points = layerPeaks.map((p, i) => {
+      const xProgress = i / (layerPeaks.length - 1);
+      const x = 80 + xProgress * 1440;
+      const elevFactor = (p.elev - 14000) / 440;
+      const y = baseY - elevFactor * 280 - layer * 20;
+      return { p, x, y, elevFactor };
+    });
+    
+    // Draw filled terrain with proper closing
+    ctx.beginPath();
+    ctx.moveTo(0, baseY + 100);
+    ctx.lineTo(points[0].x, baseY + 100);
+    points.forEach(pt => ctx.lineTo(pt.x, pt.y));
+    ctx.lineTo(points[points.length - 1].x, baseY + 100);
+    ctx.lineTo(1600, baseY + 100);
+    ctx.closePath();
+    
+    // Layer-specific colors with atmospheric perspective
+    const fade = 1 - layerDepth * 0.4;
+    const terrainGrad = ctx.createLinearGradient(0, baseY - 350, 0, baseY + 100);
+    
+    if (layer === 0) {
+      // Front layer - darker, more detail
+      terrainGrad.addColorStop(0, `rgba(140, 150, 135, ${fade})`);
+      terrainGrad.addColorStop(0.5, `rgba(95, 105, 90, ${fade})`);
+      terrainGrad.addColorStop(1, `rgba(55, 65, 55, ${fade})`);
+    } else if (layer === 1) {
+      // Middle layer
+      terrainGrad.addColorStop(0, `rgba(130, 140, 125, ${fade})`);
+      terrainGrad.addColorStop(0.5, `rgba(105, 115, 100, ${fade})`);
+      terrainGrad.addColorStop(1, `rgba(75, 85, 75, ${fade})`);
+    } else {
+      // Back layer - lighter, hazier
+      terrainGrad.addColorStop(0, `rgba(150, 155, 145, ${fade})`);
+      terrainGrad.addColorStop(0.5, `rgba(125, 130, 120, ${fade})`);
+      terrainGrad.addColorStop(1, `rgba(95, 100, 90, ${fade})`);
+    }
+    
+    ctx.fillStyle = terrainGrad;
+    ctx.fill();
+    
+    // Ridge outline
+    ctx.beginPath();
+    points.forEach((pt, i) => {
+      if (i === 0) ctx.moveTo(pt.x, pt.y);
+      else ctx.lineTo(pt.x, pt.y);
+    });
+    ctx.strokeStyle = `rgba(50, 60, 50, ${0.4 + layerDepth * 0.3})`;
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    
+    // Snow caps on front-layer peaks (terrain detail, always shown)
+    if (layer === 0) {
+      points.forEach(({ p, x, y }) => {
+        if (p.elev >= 14200) {
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+          ctx.beginPath();
+          ctx.arc(x, y - 5, 6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+    }
+  }
+
+  // ── Second pass: markers + labels for ALL peaks across all layers ──
+  // Build a map of peak → canvas position using same layer logic
+  const peakPositions = [];
+  for (let layer = 0; layer < numLayers; layer++) {
+    const layerPeaks = allPeaks.filter(p => {
+      const latNorm = (p.lat - 37) / (40.5 - 37);
+      const bucket = Math.floor(latNorm * numLayers);
+      return bucket === layer;
+    }).sort((a, b) => a.lng - b.lng);
+
+    if (layerPeaks.length === 0) continue;
+    const baseY = 680 - layer * 50;
+
+    layerPeaks.forEach((p, i) => {
+      const xProgress = i / (layerPeaks.length - 1);
+      const x = 80 + xProgress * 1440;
+      const elevFactor = (p.elev - 14000) / 440;
+      const y = baseY - elevFactor * 280 - layer * 20;
+      peakPositions.push({ p, x, y, layer });
+    });
+  }
+
+  // Draw all markers first (so labels render on top)
+  peakPositions.forEach(({ p, x, y }) => {
+    const summited = isSummited(p.id);
+    const inRange = activeRange === 'all' || p.range === activeRange;
+    ctx.save();
+    ctx.globalAlpha = inRange ? 1.0 : 0.12;
+    ctx.fillStyle = summited ? '#ab47bc' : '#26c6da';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  // Draw labels — only for active range (or all if no filter)
+  peakPositions.forEach(({ p, x, y }) => {
+    const summited = isSummited(p.id);
+    const inRange = activeRange === 'all' || p.range === activeRange;
+    if (!inRange) return; // skip labels for dimmed peaks entirely
+    ctx.save();
+    ctx.font = p.elev >= 14300 ? 'bold 13px -apple-system, sans-serif' : '11px -apple-system, sans-serif';
+    ctx.fillStyle = summited ? '#ab47bc' : '#26c6da';
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+    ctx.lineWidth = p.elev >= 14300 ? 4 : 3;
+    ctx.textAlign = 'center';
+    const label = p.name.replace('Mount ', '').replace(' Peak', '').replace(' Mountain', '');
+    const labelY = p.elev >= 14300 ? y - 22 : y - 18;
+    ctx.strokeText(label, x, labelY);
+    ctx.fillText(label, x, labelY);
+    ctx.restore();
+  });
+  
+  // Add legend/labels
+  ctx.font = '11px monospace';
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+  ctx.textAlign = 'left';
+  ctx.fillText('COLORADO 14ERS TERRAIN VIEW', 40, 40);
+  ctx.fillText('West ← → East', 40, 760);
+  ctx.textAlign = 'right';
+  ctx.fillText('14,000 - 14,440 ft', 1560, 760);
+  
+  const canvasWrapper = document.createElement('div');
+  canvasWrapper.style.padding = '20px 0';
+  canvasWrapper.style.position = 'relative';
+  
+  // Add zoom controls
+  const zoomControls = document.createElement('div');
+  zoomControls.style.cssText = 'position:absolute;top:30px;right:20px;display:flex;gap:8px;z-index:10;';
+  
+  const zoomInBtn = document.createElement('button');
+  zoomInBtn.textContent = '+';
+  zoomInBtn.style.cssText = 'width:32px;height:32px;border-radius:4px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer;font-size:18px;font-weight:bold;';
+  zoomInBtn.onclick = () => {
+    const scale = parseFloat(canvas.style.transform.replace(/[^0-9.]/g, '') || '1');
+    const newScale = Math.min(scale + 0.25, 3);
+    canvas.style.transform = `scale(${newScale})`;
+    canvas.style.transformOrigin = 'center top';
+    canvas.parentElement.style.overflowX = 'auto';
+  };
+  
+  const zoomOutBtn = document.createElement('button');
+  zoomOutBtn.textContent = '−';
+  zoomOutBtn.style.cssText = 'width:32px;height:32px;border-radius:4px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer;font-size:18px;font-weight:bold;';
+  zoomOutBtn.onclick = () => {
+    const scale = parseFloat(canvas.style.transform.replace(/[^0-9.]/g, '') || '1');
+    const newScale = Math.max(scale - 0.25, 1);
+    canvas.style.transform = `scale(${newScale})`;
+    if (newScale === 1) {
+      canvas.style.transform = '';
+      canvas.parentElement.style.overflowX = 'hidden';
+    }
+  };
+  
+  const zoomResetBtn = document.createElement('button');
+  zoomResetBtn.textContent = '100%';
+  zoomResetBtn.style.cssText = 'padding:0 10px;height:32px;border-radius:4px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer;font-size:11px;';
+  zoomResetBtn.onclick = () => {
+    canvas.style.transform = '';
+    canvas.parentElement.style.overflowX = 'hidden';
+  };
+  
+  zoomControls.appendChild(zoomInBtn);
+  zoomControls.appendChild(zoomOutBtn);
+  zoomControls.appendChild(zoomResetBtn);
+  canvasWrapper.appendChild(zoomControls);
+  
+  canvasWrapper.appendChild(canvas);
+  
+  // Make canvas clickable to select peaks
+  canvas.style.cursor = 'pointer';
+  canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * (1600 / rect.width);
+    const y = (e.clientY - rect.top) * (800 / rect.height);
+    
+    // Find nearest peak across all layers
+    let nearest = null;
+    let minDist = Infinity;
+
+    for (let layer = 0; layer < numLayers; layer++) {
+      const lp = allPeaks.filter(p => {
+        const latNorm = (p.lat - 37) / (40.5 - 37);
+        return Math.floor(latNorm * numLayers) === layer;
+      }).sort((a, b) => a.lng - b.lng);
+      if (!lp.length) continue;
+      const baseY = 680 - layer * 50;
+      lp.forEach((p, i) => {
+        const px = 80 + (i / (lp.length - 1)) * 1440;
+        const py = baseY - ((p.elev - 14000) / 440) * 280 - layer * 20;
+        const dist = Math.sqrt((x - px) ** 2 + (y - py) ** 2);
+        if (dist < minDist && dist < 40) { minDist = dist; nearest = p; }
+      });
+    }
+    
+    if (nearest) selectPeak(nearest.id);
+  });
+  
+  terrainSection.appendChild(canvasWrapper);
+  container.appendChild(terrainSection);
+}
+
+// ============================================================
+// COLLAPSIBLE SIDEBAR/PANEL BUTTONS
+// ============================================================
+document.getElementById('btnCollapseSidebar').addEventListener('click', function() {
+  const sidebar = document.querySelector('.sidebar');
+  sidebar.classList.toggle('collapsed');
+  this.textContent = sidebar.classList.contains('collapsed') ? '›' : '‹';
+});
+
+document.getElementById('btnCollapseDetail').addEventListener('click', function() {
+  const panel = document.querySelector('.detail-panel');
+  panel.classList.toggle('collapsed');
+  this.textContent = panel.classList.contains('collapsed') ? '‹' : '›';
+});
+
+// ============================================================
+// COLLAPSIBLE SIDEBAR SECTIONS
+// ============================================================
+function initCollapsibleSections() {
+  document.querySelectorAll('.sidebar-section').forEach(section => {
+    const header = section.querySelector('.sidebar-section-header');
+    const content = section.querySelector('.sidebar-section-content');
+    
+    // Set initial max-height for transition
+    if (content) {
+      content.style.maxHeight = content.scrollHeight + 'px';
+    }
+    
+    if (header) {
+      header.addEventListener('click', () => {
+        const isCollapsed = section.classList.contains('collapsed');
+        
+        if (isCollapsed) {
+          section.classList.remove('collapsed');
+          content.style.maxHeight = content.scrollHeight + 'px';
+        } else {
+          section.classList.add('collapsed');
+          content.style.maxHeight = '0px';
+        }
+      });
+    }
+  });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  updateProgress();
+  renderPeakList();
+  renderPeaks();
+  renderListBody();
+  initCollapsibleSections();
+}
+
+init();
+</script>
+<script>
+// ============================================================
+// GOOGLE MAPS INTEGRATION
+// ============================================================
+let gMap = null;
+let gMarkers = [];
+let gmapsInitPending = false;
+
+function initGoogleMap() {
+  if (gMap) { refreshMapMarkers(); return; }
+  if (gmapsInitPending) return;
+  gmapsInitPending = true;
+
+  if (typeof google === 'undefined' || !google.maps) {
+    const script = document.createElement('script');
+    script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBnQ34cb15BlEiQiFTc7yuIF_3X6_akMs4&callback=_gmapsReady';
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+  } else {
+    _gmapsReady();
+  }
+}
+
+window._gmapsReady = function() {
+  const mapDiv = document.getElementById('googleMapDiv');
+  if (!mapDiv) return;
+
+  gMap = new google.maps.Map(mapDiv, {
+    center: { lat: 39.0, lng: -106.2 },
+    zoom: 8,
+    mapTypeId: 'satellite',
+    tilt: 0,
+    mapTypeControl: true,
+    mapTypeControlOptions: {
+      style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+      position: google.maps.ControlPosition.TOP_RIGHT,
+      mapTypeIds: ['satellite', 'hybrid', 'terrain', 'roadmap']
+    },
+    streetViewControl: false,
+    fullscreenControl: true,
+    zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_CENTER }
+  });
+
+  PEAKS.forEach(peak => {
+    const marker = new google.maps.Marker({
+      position: { lat: peak.lat, lng: peak.lng },
+      map: gMap,
+      title: peak.name,
+      icon: markerIcon(peak),
+      label: markerLabel(peak),
+      zIndex: peak.id === selectedId ? 999 : 1
+    });
+    marker.addListener('click', () => selectPeak(peak.id));
+    gMarkers.push({ id: peak.id, marker });
+  });
+
+  refreshMapMarkers();
+
+  // Resize once immediately, then again after layout fully settles.
+  // The double-call handles both fast and slow flex layout calculations.
+  google.maps.event.trigger(gMap, 'resize');
+  setTimeout(() => google.maps.event.trigger(gMap, 'resize'), 200);
+};
+
+function markerIcon(peak) {
+  const isSumm = isSummited(peak.id);
+  const isSel  = peak.id === selectedId;
+  return {
+    path: google.maps.SymbolPath.CIRCLE,
+    scale: isSel ? 11 : 8,
+    fillColor: isSumm ? '#ab47bc' : '#26c6da',
+    fillOpacity: 0.92,
+    strokeColor: isSel ? '#ffffff' : 'rgba(255,255,255,0.8)',
+    strokeWeight: isSel ? 3 : 2
+  };
+}
+
+function markerLabel(peak) {
+  const isSel = peak.id === selectedId;
+  return {
+    text: peak.name,
+    color: isSel ? '#ffffff' : '#e6edf3',
+    fontSize: isSel ? '11px' : '10px',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    fontWeight: isSel ? '700' : '500'
+  };
+}
+
+function reloadMap() {
+  gMap = null;
+  gMarkers = [];
+  gmapsInitPending = false;
+  document.getElementById('googleMapDiv').innerHTML = '';
+  initGoogleMap();
+}
+
+function refreshMapMarkers() {
+  if (!gMap || !gMarkers.length) return;
+  gMarkers.forEach(({ id, marker }) => {
+    const peak = PEAKS.find(p => p.id === id);
+    if (!peak) return;
+    marker.setIcon(markerIcon(peak));
+    marker.setLabel(markerLabel(peak));
+    marker.setZIndex(peak.id === selectedId ? 999 : 1);
+    marker.setVisible(peakVisible(peak));
+  });
+}
+
+// Both script blocks now fully defined — safe to init the map
+initGoogleMap();
+</script>
+
+</body>
+</html>
